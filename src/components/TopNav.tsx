@@ -1,0 +1,328 @@
+import { useState } from "react";
+import {
+  Sparkles,
+  GraduationCap,
+  BookOpen,
+  Plus,
+  Sun,
+  Moon,
+  LogIn,
+  User,
+  LogOut,
+  ChevronDown,
+  Shield,
+  Megaphone,
+} from "lucide-react";
+import { ActiveTab, UserProfile, UserRole } from "../types";
+
+interface TopNavProps {
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
+  notesCount: number;
+  papersCount: number;
+  coursesCount: number;
+  onUploadNoteClick: () => void;
+  onUploadPaperClick: () => void;
+  onOpenHandwrittenConverter: () => void;
+  onOpenAuth: () => void;
+  currentUser: UserProfile;
+  onSignOut: () => void;
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
+  hasGeminiKey?: boolean;
+}
+
+export function TopNav({
+  activeTab,
+  setActiveTab,
+  notesCount,
+  papersCount,
+  coursesCount,
+  onUploadNoteClick,
+  onUploadPaperClick,
+  onOpenHandwrittenConverter,
+  onOpenAuth,
+  currentUser,
+  onSignOut,
+  isDarkMode,
+  onToggleDarkMode,
+  hasGeminiKey = false,
+}: TopNavProps) {
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // Role display helpers
+  const roleBadge = () => {
+    switch (currentUser.role) {
+      case "admin":
+        return {
+          label: "Admin",
+          bg: "bg-purple-50 text-purple-800 border-purple-200/80",
+          icon: <Shield size={12} className="text-purple-600" />,
+        };
+      case "courserep":
+        return {
+          label: "Course Rep",
+          bg: "bg-amber-50 text-amber-800 border-amber-200/80",
+          icon: <Megaphone size={12} className="text-amber-600" />,
+        };
+      default:
+        return {
+          label: "Scholar",
+          bg: "bg-teal-50 text-[#006d64] border-teal-200/80",
+          icon: <GraduationCap size={12} className="text-[#006d64]" />,
+        };
+    }
+  };
+
+  const badge = roleBadge();
+
+  return (
+    <header className="sticky top-0 z-40 w-full border-b border-neutral-200/80 bg-white/95 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* Brand: Lucid with rounded teal 'L' and BETA pill */}
+        <div className="flex items-center gap-5">
+          <div
+            onClick={() => setActiveTab("dashboard")}
+            className="flex items-center gap-2.5 cursor-pointer select-none group"
+          >
+            {/* Lucid rounded icon */}
+            <div className="w-8 h-8 rounded-xl bg-[#006d64] text-white flex items-center justify-center font-black text-base shadow-xs transition-transform group-hover:scale-105">
+              <span className="leading-none text-white font-bold text-sm">
+                L
+              </span>
+            </div>
+            
+            {/* Brand Title */}
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-black tracking-tight text-[#006d64] font-sans">
+                Lucid
+              </span>
+              <span className="text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f0ebff] text-[#7952eb] uppercase">
+                BETA
+              </span>
+            </div>
+          </div>
+
+          {/* Center Navigation Tabs */}
+          <nav className="hidden lg:flex items-center gap-1 p-1 bg-neutral-100/90 rounded-xl border border-neutral-200/70 text-xs font-medium">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+                activeTab === "dashboard"
+                  ? "bg-white text-neutral-950 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <span>Course Hub</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("notes")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+                activeTab === "notes"
+                  ? "bg-white text-neutral-950 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <Sparkles size={13} className={activeTab === "notes" ? "text-[#006d64]" : "text-neutral-500"} />
+              <span>Notes & Flashcards</span>
+              <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-neutral-100 text-neutral-600">
+                {notesCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("past")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+                activeTab === "past"
+                  ? "bg-white text-neutral-950 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <GraduationCap size={14} className={activeTab === "past" ? "text-[#006d64]" : "text-neutral-500"} />
+              <span>Past Questions</span>
+              <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-neutral-100 text-neutral-600">
+                {papersCount}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("courses")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+                activeTab === "courses"
+                  ? "bg-white text-neutral-950 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
+              }`}
+            >
+              <BookOpen size={13} className={activeTab === "courses" ? "text-[#006d64]" : "text-neutral-500"} />
+              <span>Course Catalog</span>
+              <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] bg-neutral-100 text-neutral-600">
+                {coursesCount}
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Right side controls: Role Badge + Theme Switch + Avatar */}
+        <div className="flex items-center gap-3">
+          {/* Active Role Indicator Badge */}
+          <div
+            onClick={onOpenAuth}
+            className={`hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold cursor-pointer transition-all hover:opacity-90 ${badge.bg}`}
+            title={`Signed in as ${currentUser.name} (${badge.label}) - Click to switch role`}
+          >
+            {badge.icon}
+            <span>{badge.label}</span>
+          </div>
+
+          {/* Quick Handwritten Upload Pill */}
+          <button
+            onClick={onOpenHandwrittenConverter}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200/80 hover:bg-teal-100/80 text-[#006d64] text-xs font-bold transition-all"
+            title="Upload photo of handwritten notes or scanned notebook PDF"
+          >
+            <span>✍️</span>
+            <span>Handwritten OCR</span>
+          </button>
+
+          {/* Theme Toggle Pill */}
+          <button
+            onClick={onToggleDarkMode}
+            aria-label="Toggle Theme"
+            className="w-12 h-6 rounded-full bg-neutral-200 p-0.5 flex items-center transition-colors relative cursor-pointer"
+          >
+            <div
+              className={`w-5 h-5 rounded-full bg-gradient-to-tr from-amber-400 to-purple-600 shadow-xs transform transition-transform flex items-center justify-center text-white text-[10px] ${
+                isDarkMode ? "translate-x-6" : "translate-x-0"
+              }`}
+            >
+              {isDarkMode ? <Moon size={10} /> : <Sun size={10} />}
+            </div>
+          </button>
+
+          {/* User Profile Avatar Bubble */}
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu((prev) => !prev)}
+              className={`w-9 h-9 rounded-full font-black text-xs flex items-center justify-center border transition-transform active:scale-95 cursor-pointer shadow-xs ${
+                currentUser.role === "admin"
+                  ? "bg-purple-100 text-purple-800 border-purple-300"
+                  : currentUser.role === "courserep"
+                  ? "bg-amber-100 text-amber-900 border-amber-300"
+                  : "bg-[#d5f5ee] text-[#006d64] border-[#006d64]/20 hover:bg-[#c2efe5]"
+              }`}
+              title="Scholar Account Menu (Click to switch role or sign out)"
+            >
+              {currentUser.avatarInitials || "OL"}
+            </button>
+
+            {/* Profile dropdown menu */}
+            {showProfileMenu && (
+              <div
+                className="absolute right-0 mt-2 w-72 bg-white rounded-2xl border border-neutral-200/90 shadow-xl p-3 z-50 animate-scale-in"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-2 py-2 border-b border-neutral-100 mb-2">
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <p className="text-xs font-bold text-neutral-900 truncate">{currentUser.name}</p>
+                    <span
+                      className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${badge.bg}`}
+                    >
+                      {badge.label}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500 font-mono">{currentUser.matricNo}</p>
+                  <p className="text-[11px] text-[#006d64] font-medium mt-0.5 truncate">
+                    {currentUser.department}
+                  </p>
+                  {currentUser.repCourseCode && (
+                    <p className="text-[10px] text-amber-800 font-semibold mt-1 bg-amber-50 p-1 rounded">
+                      Rep: {currentUser.repCourseCode}
+                    </p>
+                  )}
+                  {currentUser.staffTitle && (
+                    <p className="text-[10px] text-purple-800 font-semibold mt-1 bg-purple-50 p-1 rounded">
+                      {currentUser.staffTitle}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1 text-xs">
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      onOpenAuth();
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 text-neutral-700 flex items-center gap-2 font-medium"
+                  >
+                    <User size={14} className="text-neutral-500" />
+                    <span>Switch Role / Sign In</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      onOpenHandwrittenConverter();
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-neutral-100 text-[#006d64] flex items-center gap-2 font-medium"
+                  >
+                    <span>✍️</span>
+                    <span>Convert Handwritten Note</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      onSignOut();
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-50 text-rose-600 flex items-center gap-2 font-medium"
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out to Landing Page</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile sub-bar navigation */}
+      <div className="flex lg:hidden border-t border-neutral-200/60 px-4 py-2 bg-neutral-50 gap-2 overflow-x-auto text-xs">
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${
+            activeTab === "dashboard" ? "bg-[#006d64] text-white font-bold" : "text-neutral-600"
+          }`}
+        >
+          Course Hub
+        </button>
+        <button
+          onClick={() => setActiveTab("notes")}
+          className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${
+            activeTab === "notes" ? "bg-[#006d64] text-white font-bold" : "text-neutral-600"
+          }`}
+        >
+          Notes ({notesCount})
+        </button>
+        <button
+          onClick={() => setActiveTab("past")}
+          className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${
+            activeTab === "past" ? "bg-[#006d64] text-white font-bold" : "text-neutral-600"
+          }`}
+        >
+          Past Questions ({papersCount})
+        </button>
+        <button
+          onClick={() => setActiveTab("courses")}
+          className={`px-3 py-1.5 rounded-lg whitespace-nowrap ${
+            activeTab === "courses" ? "bg-[#006d64] text-white font-bold" : "text-neutral-600"
+          }`}
+        >
+          Catalog ({coursesCount})
+        </button>
+      </div>
+    </header>
+  );
+}
+
