@@ -52,6 +52,40 @@ export const DEMO_USERS: Record<"student" | "courserep" | "admin", UserProfile> 
   },
 };
 
+export const INITIAL_USERS_ROSTER: UserProfile[] = [
+  DEMO_USERS.admin,
+  DEMO_USERS.courserep,
+  DEMO_USERS.student,
+  {
+    id: "usr-rep-2",
+    name: "Emeka Nwankwo",
+    matricNo: "SWD/2023/0045",
+    email: "emeka.rep@lucid.edu",
+    department: "Software & Web Development",
+    level: "HND 1 • 300 Level",
+    avatarInitials: "EN",
+    isLoggedIn: false,
+    role: "courserep",
+    repCourseCode: "SWD 312 (Database Design I) Rep",
+    assignedBy: "Dr. O. C. Eze (HOD)",
+    assignedAt: "2026-09-02",
+  },
+  {
+    id: "usr-admin-2",
+    name: "Engr. Fatima Bello",
+    matricNo: "STAFF/ENG/052",
+    email: "f.bello@lucid.edu",
+    department: "Computer Engineering / SWD",
+    level: "Faculty Board",
+    avatarInitials: "FB",
+    isLoggedIn: false,
+    role: "admin",
+    staffTitle: "Sub-Dean & CBT Systems Officer",
+    assignedBy: "Dr. O. C. Eze (HOD)",
+    assignedAt: "2026-08-28",
+  },
+];
+
 export const DEFAULT_USER: UserProfile = DEMO_USERS.student;
 
 export const INITIAL_ANNOUNCEMENTS: Announcement[] = [

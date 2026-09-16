@@ -19,6 +19,7 @@ import {
   Plus,
   X,
   Pin,
+  UserPlus,
 } from "lucide-react";
 import { Course, CBTMode, CourseNote, UserProfile, Announcement } from "../types";
 
@@ -35,6 +36,7 @@ interface CourseHubDashboardProps {
   currentUser?: UserProfile;
   announcements?: Announcement[];
   onAddAnnouncement?: (announcement: Announcement) => void;
+  onOpenUserProvisioning?: () => void;
 }
 
 // Color badges for each course code
@@ -62,6 +64,7 @@ export function CourseHubDashboard({
   currentUser,
   announcements = [],
   onAddAnnouncement,
+  onOpenUserProvisioning,
 }: CourseHubDashboardProps) {
   const [courseSearch, setCourseSearch] = useState("");
   const [showOutlineModal, setShowOutlineModal] = useState(false);
@@ -247,7 +250,17 @@ export function CourseHubDashboard({
               </div>
 
               {/* Role-specific quick actions */}
-              <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                {currentUser.role === "admin" && onOpenUserProvisioning && (
+                  <button
+                    onClick={onOpenUserProvisioning}
+                    className="px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 border border-purple-300 text-purple-950 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                    title="Assign & Register Department Admins and Course Reps"
+                  >
+                    <UserPlus size={13} className="text-purple-700" />
+                    <span>Assign Accounts</span>
+                  </button>
+                )}
                 {canPostNotice && (
                   <button
                     onClick={() => setShowAnnouncementModal(true)}

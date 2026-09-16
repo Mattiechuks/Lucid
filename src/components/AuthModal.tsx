@@ -19,6 +19,7 @@ interface AuthModalProps {
   onClose: () => void;
   onAuthSuccess: (user: UserProfile) => void;
   initialMode?: "signin" | "signup";
+  usersRoster?: UserProfile[];
 }
 
 export function AuthModal({
@@ -26,9 +27,11 @@ export function AuthModal({
   onClose,
   onAuthSuccess,
   initialMode = "signin",
+  usersRoster = [],
 }: AuthModalProps) {
   const [mode, setMode] = useState<"signin" | "signup">(initialMode);
   const [selectedRole, setSelectedRole] = useState<UserRole>("student");
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Sign In state
   const [signInIdentifier, setSignInIdentifier] = useState("SWD/2023/1042");
@@ -47,45 +50,77 @@ export function AuthModal({
 
   const handleRoleChange = (r: UserRole) => {
     setSelectedRole(r);
+    setAuthError(null);
     const demo = DEMO_USERS[r];
     setSignInIdentifier(demo.matricNo);
   };
 
   const handleSignIn = (e: FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
+    const target = signInIdentifier.trim().toLowerCase();
+
+    // Check roster and demo users
+    const pool = [...usersRoster, ...Object.values(DEMO_USERS)];
+    const matched = pool.find(
+      (u) =>
+        u.role === selectedRole &&
+        (u.matricNo.toLowerCase() === target || u.email.toLowerCase() === target)
+    );
+
+    if (matched) {
+      onAuthSuccess({ ...matched, isLoggedIn: true });
+      onClose();
+      return;
+    }
+
+    // Check demo fallback
     const demo = DEMO_USERS[selectedRole];
     if (
-      signInIdentifier.toLowerCase().includes(demo.matricNo.toLowerCase()) ||
-      signInIdentifier.toLowerCase().includes(demo.email.toLowerCase())
+      target === demo.matricNo.toLowerCase() ||
+      target === demo.email.toLowerCase() ||
+      target === ""
     ) {
       onAuthSuccess({ ...demo, isLoggedIn: true });
-    } else {
-      // Dynamic user with chosen role
-      const initials = (signInIdentifier.split("/")[0] || "SC").slice(0, 2).toUpperCase();
-      const user: UserProfile = {
-        id: `usr-${Date.now()}`,
-        name:
-          selectedRole === "admin"
-            ? "Department Admin"
-            : selectedRole === "courserep"
-            ? "Course Rep Officer"
-            : "Scholar Student",
-        matricNo: signInIdentifier || demo.matricNo,
-        email: `${selectedRole}@lucid.edu`,
-        department: demo.department,
-        level: demo.level,
-        avatarInitials: initials,
-        isLoggedIn: true,
-        role: selectedRole,
-        repCourseCode: selectedRole === "courserep" ? repCourse : undefined,
-      };
-      onAuthSuccess(user);
+      onClose();
+      return;
     }
+
+    if (selectedRole !== "student") {
+      setAuthError(
+        `No authorized ${
+          selectedRole === "admin" ? "Admin" : "Course Rep"
+        } account found with ID "${signInIdentifier}". Privileged accounts must be assigned by an Admin.`
+      );
+      return;
+    }
+
+    // Dynamic user with student role
+    const initials = (signInIdentifier.split("/")[0] || "SC").slice(0, 2).toUpperCase();
+    const user: UserProfile = {
+      id: `usr-${Date.now()}`,
+      name: "Scholar Student",
+      matricNo: signInIdentifier || demo.matricNo,
+      email: `${selectedRole}@lucid.edu`,
+      department: demo.department,
+      level: demo.level,
+      avatarInitials: initials,
+      isLoggedIn: true,
+      role: "student",
+    };
+    onAuthSuccess(user);
     onClose();
   };
 
   const handleSignUp = (e: FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
+    if (selectedRole !== "student") {
+      setAuthError(
+        "Course Rep and Admin accounts cannot be self-registered. They must be provisioned by the Department Admin."
+      );
+      return;
+    }
     if (!fullName.trim()) return;
 
     const initials =
@@ -99,14 +134,13 @@ export function AuthModal({
     const user: UserProfile = {
       id: `usr-${Date.now()}`,
       name: fullName.trim(),
-      matricNo: matricNo.trim() || (selectedRole === "admin" ? "STAFF/01" : "SWD/2024/001"),
-      email: email.trim() || `${selectedRole}@student.edu`,
+      matricNo: matricNo.trim() || "SWD/2024/001",
+      email: email.trim() || "scholar@lucid.edu",
       department,
-      level: selectedRole === "admin" ? "Faculty Board" : level,
+      level,
       avatarInitials: initials,
       isLoggedIn: true,
-      role: selectedRole,
-      repCourseCode: selectedRole === "courserep" ? repCourse : undefined,
+      role: "student",
     };
     onAuthSuccess(user);
     onClose();
@@ -319,8 +353,47 @@ export function AuthModal({
               </div>
             </div>
           </form>
+        ) : selectedRole !== "student" ? (
+          <div className="p-6 pt-4 space-y-3">
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-neutral-800 space-y-2">
+              <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                <Lock size={14} className="text-amber-700" />
+                <span>Admin Provisioning Required</span>
+              </div>
+              <p className="text-[11px] text-neutral-700 leading-relaxed">
+                <strong>{selectedRole === "admin" ? "Administrator" : "Course Representative"}</strong> accounts
+                cannot be created publicly. By departmental rules, they must be officially assigned and
+                provisioned by the <strong>Department Administrator (HOD / Exam Officer)</strong>.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMode("signin");
+                setAuthError(null);
+              }}
+              className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+            >
+              <span>Switch to Sign In</span>
+              <ArrowRight size={14} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedRole("student")}
+              className="w-full py-2 text-center text-xs font-semibold text-[#006d64] hover:underline"
+            >
+              ← Or register as a Student Scholar
+            </button>
+          </div>
         ) : (
           <form onSubmit={handleSignUp} className="p-6 pt-3 space-y-3">
+            {authError && (
+              <div className="p-2 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
+                {authError}
+              </div>
+            )}
             <div>
               <label className="block text-xs font-semibold text-neutral-700 mb-1">
                 Full Name
@@ -337,12 +410,12 @@ export function AuthModal({
 
             <div>
               <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                {selectedRole === "admin" ? "Staff ID" : "Matriculation Number"}
+                Matriculation Number
               </label>
               <input
                 type="text"
                 required
-                placeholder={selectedRole === "admin" ? "STAFF/01" : "SWD/2024/001"}
+                placeholder="SWD/2024/001"
                 value={matricNo}
                 onChange={(e) => setMatricNo(e.target.value)}
                 className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64] uppercase"
@@ -365,15 +438,9 @@ export function AuthModal({
 
             <button
               type="submit"
-              className={`w-full py-2.5 rounded-xl text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-2 ${
-                selectedRole === "admin"
-                  ? "bg-purple-700 hover:bg-purple-800"
-                  : selectedRole === "courserep"
-                  ? "bg-amber-600 hover:bg-amber-700"
-                  : "bg-[#006d64] hover:bg-[#005851]"
-              }`}
+              className="w-full py-2.5 rounded-xl text-white text-xs font-bold shadow-xs transition-all active:scale-[0.98] flex items-center justify-center gap-2 bg-[#006d64] hover:bg-[#005851]"
             >
-              <span>Create {selectedRole} Account</span>
+              <span>Create Scholar Account</span>
               <ArrowRight size={14} />
             </button>
           </form>

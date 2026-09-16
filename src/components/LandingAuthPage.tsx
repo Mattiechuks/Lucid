@@ -25,16 +25,24 @@ import {
   HelpCircle,
   Eye,
   EyeOff,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 interface LandingAuthPageProps {
   onLogin: (user: UserProfile) => void;
   onExploreAsGuest: () => void;
+  usersRoster?: UserProfile[];
+  isDarkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 export function LandingAuthPage({
   onLogin,
   onExploreAsGuest,
+  usersRoster = [],
+  isDarkMode = false,
+  onToggleDarkMode,
 }: LandingAuthPageProps) {
   // Auth state
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
@@ -63,51 +71,69 @@ export function LandingAuthPage({
     setAuthError(null);
 
     if (authMode === "signin") {
-      // Validate or authenticate
       const targetEmail = email.trim().toLowerCase();
       const targetId = identifier.trim().toLowerCase();
 
-      // Check if matches known demo or fallback
-      let matchedUser: UserProfile | undefined = undefined;
-      Object.values(DEMO_USERS).forEach((usr) => {
-        if (
-          usr.role === selectedRole &&
-          (usr.email.toLowerCase() === targetEmail ||
-            usr.matricNo.toLowerCase() === targetId ||
-            targetEmail === "" ||
-            targetEmail.includes("demo"))
-        ) {
-          matchedUser = usr;
-        }
-      });
+      // Search roster first, then demo users
+      const pool = [...usersRoster, ...Object.values(DEMO_USERS)];
+      let matchedUser = pool.find(
+        (u) =>
+          u.role === selectedRole &&
+          ((targetEmail && u.email.toLowerCase() === targetEmail) ||
+            (targetId && u.matricNo.toLowerCase() === targetId))
+      );
 
+      // If user typed demo credentials or left blank
       if (!matchedUser) {
-        // Construct dynamic user with selected role
-        const generatedUser: UserProfile = {
-          id: `usr-${Date.now()}`,
-          name:
-            selectedRole === "admin"
-              ? "Faculty Administrator"
-              : selectedRole === "courserep"
-              ? "Course Representative"
-              : "Scholar Student",
-          matricNo: identifier || (selectedRole === "admin" ? "STAFF/ENG/049" : "SWD/2023/1042"),
-          email: email || `${selectedRole}@lucid.edu`,
-          department,
-          level: selectedRole === "admin" ? "Faculty Board" : level,
-          avatarInitials:
-            selectedRole === "admin" ? "AD" : selectedRole === "courserep" ? "CR" : "ST",
-          isLoggedIn: true,
-          role: selectedRole,
-          repCourseCode: selectedRole === "courserep" ? repCourse : undefined,
-          staffTitle: selectedRole === "admin" ? adminStaffTitle : undefined,
-        };
-        onLogin(generatedUser);
-      } else {
-        onLogin({ ...matchedUser, isLoggedIn: true });
+        const demo = DEMO_USERS[selectedRole];
+        if (!targetEmail && !targetId) {
+          matchedUser = demo;
+        } else if (
+          targetEmail.includes("demo") ||
+          demo.email.toLowerCase() === targetEmail ||
+          demo.matricNo.toLowerCase() === targetId
+        ) {
+          matchedUser = demo;
+        }
       }
+
+      if (matchedUser) {
+        onLogin({ ...matchedUser, isLoggedIn: true });
+        return;
+      }
+
+      // For privileged roles (Course Rep / Admin), require matching an assigned account
+      if (selectedRole !== "student") {
+        setAuthError(
+          `No registered ${
+            selectedRole === "admin" ? "Department Administrator" : "Course Representative"
+          } found matching "${identifier || email}". Per academic policy, this account must first be assigned and provisioned by an Administrator.`
+        );
+        return;
+      }
+
+      // For Student, allow dynamic login if identifier was entered
+      const generatedUser: UserProfile = {
+        id: `usr-${Date.now()}`,
+        name: name.trim() || "Scholar Student",
+        matricNo: identifier || "SWD/2023/1042",
+        email: email || "scholar@lucid.edu",
+        department,
+        level,
+        avatarInitials: "SC",
+        isLoggedIn: true,
+        role: "student",
+      };
+      onLogin(generatedUser);
     } else {
-      // Sign Up validation
+      // Sign Up validation: Strict role check
+      if (selectedRole !== "student") {
+        setAuthError(
+          "Course Representative and Administrator accounts cannot be self-registered. They must be officially assigned and provisioned by the Department Administrator."
+        );
+        return;
+      }
+
       if (!name.trim()) {
         setAuthError("Please enter your full name.");
         return;
@@ -117,26 +143,25 @@ export function LandingAuthPage({
         return;
       }
 
-      const initials = name
-        .trim()
-        .split(" ")
-        .map((p) => p[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2) || "SC";
+      const initials =
+        name
+          .trim()
+          .split(" ")
+          .map((p) => p[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2) || "SC";
 
       const newUser: UserProfile = {
         id: `usr-reg-${Date.now()}`,
         name: name.trim(),
-        matricNo: identifier.trim() || (selectedRole === "admin" ? "STAFF/NEW/01" : "REG/2024/001"),
+        matricNo: identifier.trim() || "SWD/2024/001",
         email: email.trim(),
         department,
-        level: selectedRole === "admin" ? "Academic Board" : level,
+        level,
         avatarInitials: initials,
         isLoggedIn: true,
-        role: selectedRole,
-        repCourseCode: selectedRole === "courserep" ? repCourse : undefined,
-        staffTitle: selectedRole === "admin" ? adminStaffTitle : undefined,
+        role: "student",
       };
 
       onLogin(newUser);
@@ -144,9 +169,9 @@ export function LandingAuthPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] text-neutral-900 flex flex-col selection:bg-teal-100 selection:text-[#006d64]">
+    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0a0f1d] text-neutral-900 dark:text-slate-100 flex flex-col selection:bg-teal-100 selection:text-[#006d64] transition-colors duration-200">
       {/* Top Navbar */}
-      <header className="border-b border-neutral-200/80 bg-white/95 backdrop-blur-md sticky top-0 z-30">
+      <header className="border-b border-neutral-200/80 dark:border-slate-800 bg-white/95 dark:bg-[#0e1627]/95 backdrop-blur-md sticky top-0 z-30 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           {/* Brand Logo */}
           <div className="flex items-center gap-3">
@@ -157,7 +182,7 @@ export function LandingAuthPage({
               <span className="text-xl font-black tracking-tight text-[#006d64]">
                 Lucid
               </span>
-              <span className="text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f0ebff] text-[#7952eb] uppercase">
+              <span className="text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f0ebff] dark:bg-purple-950/60 text-[#7952eb] dark:text-purple-300 uppercase">
                 BETA
               </span>
             </div>
@@ -165,9 +190,26 @@ export function LandingAuthPage({
 
           {/* Header Actions */}
           <div className="flex items-center gap-3">
+            {onToggleDarkMode && (
+              <button
+                onClick={onToggleDarkMode}
+                aria-label="Toggle Theme"
+                className="w-12 h-6 rounded-full bg-neutral-200 dark:bg-slate-700 p-0.5 flex items-center transition-colors relative cursor-pointer"
+                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full bg-gradient-to-tr from-amber-400 to-purple-600 shadow-xs transform transition-transform flex items-center justify-center text-white text-[10px] ${
+                    isDarkMode ? "translate-x-6" : "translate-x-0"
+                  }`}
+                >
+                  {isDarkMode ? <Moon size={10} /> : <Sun size={10} />}
+                </div>
+              </button>
+            )}
+
             <button
               onClick={onExploreAsGuest}
-              className="text-xs font-semibold text-neutral-600 hover:text-neutral-900 px-3 py-2 rounded-lg hover:bg-neutral-100 transition-colors"
+              className="text-xs font-semibold text-neutral-600 dark:text-slate-400 hover:text-neutral-900 dark:hover:text-slate-100 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-slate-800 transition-colors"
             >
               Explore as Guest
             </button>
@@ -344,9 +386,17 @@ export function LandingAuthPage({
                 <div className="p-6 space-y-5">
                   {/* Role Differentiation Selector */}
                   <div>
-                    <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider mb-2">
-                      Select Account Role
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                        Select Account Role
+                      </label>
+                      {authMode === "signup" && (
+                        <span className="text-[10px] text-amber-800 font-semibold flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                          <Lock size={10} />
+                          Rep & Admin: HOD Provisioned
+                        </span>
+                      )}
+                    </div>
                     <div className="grid grid-cols-3 gap-2">
                       <button
                         type="button"
@@ -367,7 +417,7 @@ export function LandingAuthPage({
                           <GraduationCap size={15} />
                         </div>
                         <span className="text-xs font-bold text-neutral-800">Scholar</span>
-                        <span className="text-[10px] text-neutral-400">Student</span>
+                        <span className="text-[10px] text-neutral-400">Open Register</span>
                       </button>
 
                       <button
@@ -389,7 +439,10 @@ export function LandingAuthPage({
                           <Megaphone size={15} />
                         </div>
                         <span className="text-xs font-bold text-neutral-800">Course Rep</span>
-                        <span className="text-[10px] text-neutral-400">Class Officer</span>
+                        <span className="text-[10px] text-amber-700 font-semibold flex items-center gap-0.5">
+                          {authMode === "signup" && <Lock size={9} />}
+                          Admin Assigned
+                        </span>
                       </button>
 
                       <button
@@ -411,7 +464,10 @@ export function LandingAuthPage({
                           <Shield size={15} />
                         </div>
                         <span className="text-xs font-bold text-neutral-800">Admin</span>
-                        <span className="text-[10px] text-neutral-400">HOD / Staff</span>
+                        <span className="text-[10px] text-purple-700 font-semibold flex items-center gap-0.5">
+                          {authMode === "signup" && <Lock size={9} />}
+                          Admin Assigned
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -422,7 +478,7 @@ export function LandingAuthPage({
                       <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-wide">
                         ⚡ Quick 1-Click Role Login
                       </span>
-                      <span className="text-[10px] text-neutral-400">Instant Demo</span>
+                      <span className="text-[10px] text-neutral-400">Instant Verification</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -449,8 +505,61 @@ export function LandingAuthPage({
                     </div>
                   </div>
 
-                  {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-3.5">
+                  {/* Signup Policy Check: Course Rep & Admin must be assigned by an Admin */}
+                  {authMode === "signup" && selectedRole !== "student" ? (
+                    <div className="p-5 rounded-2xl bg-amber-50/90 border border-amber-300 text-neutral-800 space-y-3 animate-scale-in">
+                      <div className="flex items-center gap-2.5 text-amber-950 font-bold text-sm">
+                        <div className="w-8 h-8 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center shrink-0">
+                          <Lock size={16} />
+                        </div>
+                        <div>
+                          <h4>Official Department Authorization Required</h4>
+                          <span className="text-[10px] text-amber-800 font-normal">
+                            Institutional Access Control Policy
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-neutral-700 leading-relaxed">
+                        <strong>
+                          {selectedRole === "admin" ? "Department Administrator" : "Course Representative"}
+                        </strong>{" "}
+                        accounts cannot be self-registered publicly. Per faculty regulations, these accounts
+                        must be officially registered and provisioned by the{" "}
+                        <strong>Department Administrator (HOD / Exam Officer)</strong>.
+                      </p>
+
+                      <div className="p-3.5 rounded-xl bg-white border border-amber-200 text-xs space-y-2">
+                        <p className="font-bold text-neutral-900">Already have your assigned credentials?</p>
+                        <p className="text-neutral-600 text-[11px]">
+                          Switch to <strong>Sign In</strong> and enter your portal using your assigned Staff ID or
+                          Matric Number.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthMode("signin");
+                            setAuthError(null);
+                          }}
+                          className="w-full py-2 px-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-2xs transition-colors"
+                        >
+                          Switch to Sign In
+                        </button>
+                      </div>
+
+                      <div className="text-center pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedRole("student")}
+                          className="text-xs font-semibold text-[#006d64] hover:underline"
+                        >
+                          ← Or create a regular Scholar (Student) account
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Form */
+                    <form onSubmit={handleSubmit} className="space-y-3.5">
                     {/* Sign Up: Full Name */}
                     {authMode === "signup" && (
                       <div>
@@ -653,6 +762,7 @@ export function LandingAuthPage({
                       <ArrowRight size={14} />
                     </button>
                   </form>
+                  )}
 
                   {/* Guest Explore link */}
                   <div className="pt-2 text-center border-t border-neutral-100">

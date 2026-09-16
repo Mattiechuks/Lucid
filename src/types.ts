@@ -106,6 +106,9 @@ export interface UserProfile {
   role: UserRole;
   repCourseCode?: string;
   staffTitle?: string;
+  assignedBy?: string;
+  assignedAt?: string;
+  password?: string;
 }
 
 export type ActiveTab = "dashboard" | "notes" | "past" | "courses" | "cbt" | "practicals" | "admin";

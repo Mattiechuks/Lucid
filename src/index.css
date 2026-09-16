@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -26,4 +28,262 @@
 
 .rotate-y-180 {
   transform: rotateY(180deg);
+}
+
+/* ==========================================================================
+   MATURE DARK THEME ARCHITECTURE
+   Eliminates visual dissonance by transitioning all light surfaces,
+   borders, shadows, form controls, and typography into a cohesive,
+   high-contrast obsidian/slate palette.
+   ========================================================================== */
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0a0f1d !important;
+  color: #f1f5f9 !important;
+}
+
+/* Core card & container surfaces */
+.dark .bg-white {
+  background-color: #121a2c !important;
+}
+
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .bg-white\/80 {
+  background-color: rgba(18, 26, 44, 0.95) !important;
+}
+
+.dark .bg-\[\#faf9f6\],
+.dark .bg-\[\#f8fafc\] {
+  background-color: #0a0f1d !important;
+}
+
+.dark .bg-neutral-50,
+.dark .bg-slate-50,
+.dark .bg-gray-50,
+.dark .bg-neutral-50\/50 {
+  background-color: #0e1627 !important;
+}
+
+.dark .bg-neutral-100,
+.dark .bg-slate-100,
+.dark .bg-gray-100 {
+  background-color: #18233a !important;
+}
+
+.dark .bg-neutral-200,
+.dark .bg-slate-200 {
+  background-color: #243452 !important;
+}
+
+/* Borders & Dividers */
+.dark .border-neutral-200,
+.dark .border-neutral-200\/60,
+.dark .border-neutral-200\/70,
+.dark .border-neutral-200\/80,
+.dark .border-neutral-200\/90,
+.dark .border-neutral-300,
+.dark .border-slate-200,
+.dark .border-gray-200 {
+  border-color: #202d45 !important;
+}
+
+.dark .border-neutral-100,
+.dark .border-slate-100 {
+  border-color: #19243a !important;
+}
+
+.dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #202d45 !important;
+}
+
+/* Typography Hierarchy */
+.dark .text-neutral-900,
+.dark .text-slate-900,
+.dark .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+.dark .text-neutral-800,
+.dark .text-slate-800,
+.dark .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-neutral-700,
+.dark .text-slate-700,
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-neutral-600,
+.dark .text-slate-600,
+.dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+.dark .text-neutral-500,
+.dark .text-slate-500,
+.dark .text-gray-500 {
+  color: #64748b !important;
+}
+
+.dark .text-neutral-400,
+.dark .text-slate-400 {
+  color: #798ba3 !important;
+}
+
+/* Form Controls & Inputs */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="search"],
+.dark input[type="number"],
+.dark textarea,
+.dark select {
+  background-color: #0b1220 !important;
+  color: #f8fafc !important;
+  border-color: #253550 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #556784 !important;
+}
+
+/* Modals & Popovers elevated lighting */
+.dark .shadow-xs,
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Specific component tints in dark mode */
+.dark .bg-teal-50,
+.dark .bg-teal-50\/50,
+.dark .bg-teal-50\/60,
+.dark .bg-teal-50\/70,
+.dark .bg-teal-50\/80 {
+  background-color: rgba(13, 148, 136, 0.16) !important;
+  border-color: rgba(20, 184, 166, 0.35) !important;
+}
+
+.dark .text-\[\#006d64\],
+.dark .text-teal-900,
+.dark .text-teal-800,
+.dark .text-teal-700 {
+  color: #2dd4bf !important;
+}
+
+.dark .bg-purple-50,
+.dark .bg-purple-50\/50,
+.dark .bg-purple-50\/60,
+.dark .bg-purple-100 {
+  background-color: rgba(147, 51, 234, 0.16) !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.dark .text-purple-800,
+.dark .text-purple-900,
+.dark .text-purple-950 {
+  color: #c084fc !important;
+}
+
+.dark .bg-amber-50,
+.dark .bg-amber-50\/50,
+.dark .bg-amber-50\/60,
+.dark .bg-amber-100 {
+  background-color: rgba(217, 119, 6, 0.16) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+.dark .text-amber-800,
+.dark .text-amber-900,
+.dark .text-amber-950 {
+  color: #fbbf24 !important;
+}
+
+.dark .bg-blue-50,
+.dark .bg-blue-100 {
+  background-color: rgba(37, 99, 235, 0.16) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+.dark .text-blue-800,
+.dark .text-blue-900 {
+  color: #60a5fa !important;
+}
+
+.dark .bg-emerald-50,
+.dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+.dark .text-emerald-800,
+.dark .text-emerald-900 {
+  color: #34d399 !important;
+}
+
+.dark .bg-rose-50,
+.dark .bg-rose-100 {
+  background-color: rgba(225, 29, 72, 0.16) !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+.dark .text-rose-800,
+.dark .text-rose-900 {
+  color: #fb7185 !important;
+}
+
+/* Primary buttons in dark mode */
+.dark button.bg-neutral-900,
+.dark a.bg-neutral-900 {
+  background-color: #006d64 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(45, 212, 191, 0.35) !important;
+}
+
+.dark button.bg-neutral-900:hover,
+.dark a.bg-neutral-900:hover {
+  background-color: #005a52 !important;
+}
+
+/* Hover states across cards and list items */
+.dark .hover\:bg-neutral-50:hover {
+  background-color: #162035 !important;
+}
+
+.dark .hover\:bg-neutral-100:hover {
+  background-color: #1e2b44 !important;
+}
+
+/* Select options inside dropdowns */
+.dark select option {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Custom scrollbars in dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #0a0f1d;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #243452;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #33486e;
 }

@@ -17,6 +17,7 @@ import {
   DEFAULT_USER,
   DEMO_USERS,
   INITIAL_ANNOUNCEMENTS,
+  INITIAL_USERS_ROSTER,
   buildGenericDeck,
 } from "./data/mockData";
 import { TopNav } from "./components/TopNav";
@@ -34,6 +35,7 @@ import { HandwrittenConverterModal } from "./components/HandwrittenConverterModa
 import { CBTQuizModal } from "./components/CBTQuizModal";
 import { PracticalReportsModal } from "./components/PracticalReportsModal";
 import { LandingAuthPage } from "./components/LandingAuthPage";
+import { AdminUserProvisioningModal } from "./components/AdminUserProvisioningModal";
 import { Check } from "lucide-react";
 
 const LOGGED_OUT_GUEST: UserProfile = {
@@ -81,14 +83,45 @@ export default function App() {
     }
     return INITIAL_ANNOUNCEMENTS;
   });
-  
+
+  // User accounts roster (Admin provisioned accounts & pre-registered accounts)
+  const [usersRoster, setUsersRoster] = useState<UserProfile[]>(() => {
+    const saved = localStorage.getItem("lucid_users_roster");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return INITIAL_USERS_ROSTER;
+      }
+    }
+    return INITIAL_USERS_ROSTER;
+  });
+
   // Modals state
   const [showHandwrittenConverter, setShowHandwrittenConverter] = useState(false);
+  const [showUserProvisioningModal, setShowUserProvisioningModal] = useState(false);
   const [cbtQuizState, setCbtQuizState] = useState<{ isOpen: boolean; course: Course; mode: CBTMode } | null>(null);
   const [practicalReportState, setPracticalReportState] = useState<{ isOpen: boolean; course: Course } | null>(null);
   
-  // Dark mode toggle
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Dark mode toggle with persistence & html class sync
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem("lucid_theme");
+    if (saved) return saved === "dark";
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("lucid_theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("lucid_theme", "light");
+    }
+  }, [isDarkMode]);
 
   const [notes, setNotes] = useState<CourseNote[]>(() => {
     const saved = localStorage.getItem("lucid_notes") || localStorage.getItem("olisedesk_notes");
@@ -141,6 +174,26 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("lucid_announcements", JSON.stringify(announcements));
   }, [announcements]);
+
+  useEffect(() => {
+    localStorage.setItem("lucid_users_roster", JSON.stringify(usersRoster));
+  }, [usersRoster]);
+
+  const handleProvisionUser = (newUser: UserProfile) => {
+    setUsersRoster((prev) => [newUser, ...prev]);
+    setDownloadToast(
+      `Assigned ${newUser.name} as ${
+        newUser.role === "admin" ? "Department Admin" : "Course Rep"
+      } (ID: ${newUser.matricNo})`
+    );
+    setTimeout(() => setDownloadToast(null), 4000);
+  };
+
+  const handleRevokeUser = (userId: string) => {
+    setUsersRoster((prev) => prev.filter((u) => u.id !== userId));
+    setDownloadToast("User account access revoked from roster.");
+    setTimeout(() => setDownloadToast(null), 3000);
+  };
 
   const handleAddAnnouncement = (newAnn: Announcement) => {
     setAnnouncements((prev) => [newAnn, ...prev]);
@@ -408,12 +461,15 @@ export default function App() {
       <LandingAuthPage
         onLogin={handleLoginSuccess}
         onExploreAsGuest={() => setIsGuestExploring(true)}
+        usersRoster={usersRoster}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode((prev) => !prev)}
       />
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "bg-neutral-900 text-neutral-100" : "bg-[#faf9f6] text-neutral-900"} flex flex-col transition-colors duration-200`}>
+    <div className={`min-h-screen ${isDarkMode ? "bg-[#0a0f1d] text-slate-100" : "bg-[#faf9f6] text-neutral-900"} flex flex-col transition-colors duration-200`}>
       {/* Top Navigation */}
       <TopNav
         activeTab={activeTab}
@@ -455,6 +511,7 @@ export default function App() {
             currentUser={currentUser}
             announcements={announcements}
             onAddAnnouncement={handleAddAnnouncement}
+            onOpenUserProvisioning={() => setShowUserProvisioningModal(true)}
           />
         )}
 
@@ -566,11 +623,23 @@ export default function App() {
       <AuthModal
         isOpen={isAuthModalOpen}
         initialMode={authModalMode}
+        usersRoster={usersRoster}
         onClose={() => setIsAuthModalOpen(false)}
         onAuthSuccess={(user) => {
           handleLoginSuccess(user);
           setIsAuthModalOpen(false);
         }}
+      />
+
+      {/* Admin User Provisioning Modal (Admin Exclusive) */}
+      <AdminUserProvisioningModal
+        isOpen={showUserProvisioningModal}
+        onClose={() => setShowUserProvisioningModal(false)}
+        currentUser={currentUser}
+        courses={COURSES}
+        usersRoster={usersRoster}
+        onProvisionUser={handleProvisionUser}
+        onRevokeUser={handleRevokeUser}
       />
 
       {/* Handwritten Note Converter & Camera Modal */}
