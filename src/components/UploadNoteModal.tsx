@@ -1,11 +1,13 @@
 import { useState, useRef, FormEvent } from "react";
-import { X, Upload, Sparkles, FileText, AlignLeft, Check } from "lucide-react";
-import { Course } from "../types";
+import { X, Upload, Sparkles, FileText, AlignLeft, Check, Loader2, BookOpen } from "lucide-react";
+import { Course, UserProfile } from "../types";
+import { extractTextFromPDF } from "../lib/pdfExtractor";
 
 interface UploadNoteModalProps {
   courses: Course[];
   onClose: () => void;
   onOpenHandwritten: () => void;
+  currentUser?: UserProfile;
   onSubmit: (data: {
     course: string;
     title: string;
@@ -15,16 +17,18 @@ interface UploadNoteModalProps {
   }) => void;
 }
 
-export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit }: UploadNoteModalProps) {
+export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit, currentUser }: UploadNoteModalProps) {
   const [activeTab, setActiveTab] = useState<"file" | "paste">("file");
   const [course, setCourse] = useState(courses[0]?.code || "AIT 311");
   const [title, setTitle] = useState("");
   const [fileName, setFileName] = useState("");
   const [rawText, setRawText] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isExtractingPdf, setIsExtractingPdf] = useState(false);
+  const [pdfStats, setPdfStats] = useState<{ pages: number; words: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (file: File | undefined) => {
+  const handleFileChange = async (file: File | undefined) => {
     if (!file) return;
     setFileName(file.name);
     if (!title) {
@@ -34,6 +38,22 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit 
         .replace(/[-_]+/g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase());
       setTitle(cleanName);
+    }
+
+    // If it's a PDF, extract text directly via pdfjs-dist
+    if (file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf") {
+      setIsExtractingPdf(true);
+      setPdfStats(null);
+      try {
+        const extracted = await extractTextFromPDF(file);
+        setRawText(extracted.text);
+        setPdfStats({ pages: extracted.numPages, words: extracted.wordCount });
+      } catch (err) {
+        console.warn("PDF extraction warning:", err);
+      } finally {
+        setIsExtractingPdf(false);
+      }
+      return;
     }
 
     // If it's a text file, read content
@@ -95,6 +115,28 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit 
 
         {/* Tab switch: File Upload vs Direct Text */}
         <div className="px-6 pt-4 space-y-3">
+          {/* Official Course Rep Authorization Pill */}
+          {currentUser && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/90 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-sm">
+                  📢
+                </span>
+                <div>
+                  <p className="font-bold text-amber-950 text-xs">
+                    Course Rep Upload Authorization Active
+                  </p>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    Uploader: <strong>{currentUser.name}</strong> • {currentUser.institutionId} ({currentUser.level})
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-200/90 text-amber-950 shrink-0">
+                Verified
+              </span>
+            </div>
+          )}
+
           {/* Handwritten Note Highlight Banner */}
           <div className="p-3 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
@@ -204,10 +246,25 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit 
                     : "border-neutral-200 hover:border-neutral-300 bg-neutral-50/50"
                 }`}
               >
-                {fileName ? (
-                  <div className="flex items-center justify-center gap-2 text-emerald-700 text-xs font-medium">
-                    <Check size={16} />
-                    <span className="font-semibold">{fileName}</span>
+                {isExtractingPdf ? (
+                  <div className="space-y-2 py-2 text-emerald-700">
+                    <Loader2 size={24} className="mx-auto animate-spin text-[#006d64]" />
+                    <p className="text-xs font-semibold">Extracting Lecture Content via PDF.js engine...</p>
+                    <p className="text-[11px] text-neutral-500">Transcribing pages into clean machine-readable text</p>
+                  </div>
+                ) : fileName ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-emerald-700 text-xs font-medium">
+                      <Check size={16} />
+                      <span className="font-semibold">{fileName}</span>
+                    </div>
+                    {pdfStats && (
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-300/80 text-[11px] font-semibold text-emerald-900">
+                        <BookOpen size={12} />
+                        <span>{pdfStats.pages} Page{pdfStats.pages > 1 ? "s" : ""} Extracted • ~{pdfStats.words.toLocaleString()} Words Ready</span>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-neutral-400">Click to change document</p>
                   </div>
                 ) : (
                   <div className="space-y-1.5 text-neutral-500">
@@ -216,7 +273,7 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit 
                       Click to choose or drag and drop file here
                     </p>
                     <p className="text-[11px] text-neutral-400">
-                      PDF, DOCX, or plain text up to 25MB
+                      PDF (automatic text extraction), DOCX, or plain text
                     </p>
                   </div>
                 )}

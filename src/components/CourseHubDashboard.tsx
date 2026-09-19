@@ -20,8 +20,13 @@ import {
   X,
   Pin,
   UserPlus,
+  School,
+  Building2,
+  RefreshCw,
+  Lock,
 } from "lucide-react";
-import { Course, CBTMode, CourseNote, UserProfile, Announcement } from "../types";
+import { Course, CBTMode, CourseNote, UserProfile, Announcement, InstitutionType } from "../types";
+import { INSTITUTIONS, getLevelsForInstitutionType, getInstitutionById, getDefaultCohortForInstitution } from "../data/institutionsData";
 
 interface CourseHubDashboardProps {
   courses: Course[];
@@ -37,6 +42,14 @@ interface CourseHubDashboardProps {
   announcements?: Announcement[];
   onAddAnnouncement?: (announcement: Announcement) => void;
   onOpenUserProvisioning?: () => void;
+  onSwitchCohort?: (cohort: {
+    institutionId: string;
+    institutionName: string;
+    institutionType: InstitutionType;
+    facultyOrSchool: string;
+    department: string;
+    level: string;
+  }) => void;
 }
 
 // Color badges for each course code
@@ -65,10 +78,32 @@ export function CourseHubDashboard({
   announcements = [],
   onAddAnnouncement,
   onOpenUserProvisioning,
+  onSwitchCohort,
 }: CourseHubDashboardProps) {
   const [courseSearch, setCourseSearch] = useState("");
   const [showOutlineModal, setShowOutlineModal] = useState(false);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [showCohortModal, setShowCohortModal] = useState(false);
+
+  // Cohort switcher form state inside modal
+  const [modalInstType, setModalInstType] = useState<InstitutionType>(
+    currentUser?.institutionType || "polytechnic"
+  );
+  const [modalInstId, setModalInstId] = useState(
+    currentUser?.institutionId || "FEDPONEK"
+  );
+  const selectedInstObj = getInstitutionById(modalInstId) || INSTITUTIONS[0];
+  const [modalDivision, setModalDivision] = useState(
+    currentUser?.facultyOrSchool || selectedInstObj.divisions[0]?.name || ""
+  );
+  const activeDivisionObj = selectedInstObj.divisions.find((d) => d.name === modalDivision) || selectedInstObj.divisions[0];
+  const [modalDepartment, setModalDepartment] = useState(
+    currentUser?.department || activeDivisionObj?.departments[0] || "Software & Web Development"
+  );
+  const [modalLevel, setModalLevel] = useState(
+    currentUser?.level || selectedInstObj.supportedLevels[0] || "HND 1"
+  );
+
   const [newNoticeTitle, setNewNoticeTitle] = useState("");
   const [newNoticeContent, setNewNoticeContent] = useState("");
   const [newNoticePinned, setNewNoticePinned] = useState(true);
@@ -96,6 +131,20 @@ export function CourseHubDashboard({
     setShowAnnouncementModal(false);
   };
 
+  const handleApplyCohort = () => {
+    if (onSwitchCohort) {
+      onSwitchCohort({
+        institutionId: modalInstId,
+        institutionName: selectedInstObj.name,
+        institutionType: modalInstType,
+        facultyOrSchool: modalDivision,
+        department: modalDepartment,
+        level: modalLevel,
+      });
+    }
+    setShowCohortModal(false);
+  };
+
   const filteredCourses = courses.filter(
     (c) =>
       c.code.toLowerCase().includes(courseSearch.toLowerCase()) ||
@@ -105,12 +154,49 @@ export function CourseHubDashboard({
   const courseNotes = notes.filter((n) => n.course === activeCourse.code);
   const totalCards = courseNotes.reduce((acc, curr) => acc + (curr.cardCount || 0), 0) || (activeCourse.flashcardCount || 5);
 
+  const totalRegisteredUnits = courses.reduce((sum, c) => sum + (c.units || 3), 0);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 animate-fade-in">
       {/* 2-Column Layout: Left Courses Sidebar + Right Main Course View */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Sidebar: 4 cols */}
         <aside className="lg:col-span-4 space-y-4">
+          {/* Institutional Cohort Segregation Card */}
+          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-center text-sm shrink-0">
+                  🏛️
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-neutral-900 truncate">
+                    {currentUser?.institutionName || (currentUser?.institutionType === "polytechnic" ? "Federal Polytechnic Nekede" : "University of Lagos")}
+                  </p>
+                  <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">
+                    {currentUser?.institutionType === "polytechnic" ? "Polytechnic Structure" : "University Structure"}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowCohortModal(true)}
+                className="text-[11px] font-bold text-[#006d64] hover:text-[#005851] hover:underline shrink-0 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200/80 flex items-center gap-1 transition-all"
+                title="Explore and switch between Polytechnic and University departments and levels"
+              >
+                <RefreshCw size={11} />
+                <span>Switch</span>
+              </button>
+            </div>
+            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+              <span className="text-neutral-600 truncate max-w-[180px]" title={currentUser?.department}>
+                {currentUser?.department || "Software & Web Development"}
+              </span>
+              <span className="px-2 py-0.5 rounded-md font-bold bg-[#006d64]/10 text-[#006d64] shrink-0 text-[10px]">
+                {currentUser?.level || activeCourse.level || "HND 1"}
+              </span>
+            </div>
+          </div>
+
           {/* Search courses input */}
           <div className="relative">
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
@@ -177,12 +263,12 @@ export function CourseHubDashboard({
           {/* Semester Summary Card matching screenshot */}
           <div className="p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-xs space-y-2">
             <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-              <span>First Semester</span>
-              <span>HND 1 / Year 3</span>
+              <span>{activeCourse.semester || "First Semester"}</span>
+              <span className="text-[#006d64] font-bold">{currentUser?.level || activeCourse.level || "HND 1"}</span>
             </div>
             <div className="flex items-center justify-between pt-1 border-t border-neutral-100">
-              <span className="text-xs text-neutral-600 font-medium">8 Courses Registered</span>
-              <span className="text-xs font-bold text-neutral-900">24 Total Credit Units</span>
+              <span className="text-xs text-neutral-600 font-medium">{courses.length} Courses Registered</span>
+              <span className="text-xs font-bold text-neutral-900">{totalRegisteredUnits} Total Credit Units</span>
             </div>
           </div>
         </aside>
@@ -236,16 +322,21 @@ export function CourseHubDashboard({
                           : "bg-teal-200/70 text-teal-900"
                       }`}
                     >
-                      {currentUser.role}
+                      {currentUser.role === "courserep" ? "Course Rep" : currentUser.role}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-600 mt-0.5">
-                    {currentUser.role === "admin"
-                      ? `${currentUser.name} (${currentUser.staffTitle || "Exam Officer"}) — Faculty Moderation Active`
-                      : currentUser.role === "courserep"
-                      ? `${currentUser.name} — ${currentUser.repCourseCode || "HND 1 Course Representative"}`
-                      : `${currentUser.name} (${currentUser.matricNo}) • ${currentUser.department}`}
-                  </p>
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-600 mt-0.5 flex-wrap">
+                    <span className="font-semibold text-neutral-900">{currentUser.name}</span>
+                    <span className="text-neutral-300">•</span>
+                    <span className="font-medium text-[#006d64]">
+                      {currentUser.institutionName || (currentUser.institutionType === "polytechnic" ? "Federal Polytechnic Nekede" : "University of Lagos")}
+                    </span>
+                    <span className="text-neutral-300">•</span>
+                    <span className="truncate">{currentUser.department}</span>
+                    <span className="px-1.5 py-0.2 rounded bg-neutral-200/70 text-neutral-800 font-bold text-[10px]">
+                      {currentUser.level || "HND 1"}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -278,9 +369,20 @@ export function CourseHubDashboard({
                   <button
                     onClick={onUploadNoteClick}
                     className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                    title="Authorized to upload official course syllabus notes"
                   >
                     <Upload size={13} />
                     <span>Upload Rep Note</span>
+                  </button>
+                )}
+                {currentUser.role === "student" && (
+                  <button
+                    onClick={onUploadNoteClick}
+                    className="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-600 text-xs font-medium shadow-2xs transition-all flex items-center gap-1.5"
+                    title="Uploads restricted to verified Class Representatives"
+                  >
+                    <Lock size={12} className="text-neutral-500" />
+                    <span>Rep Upload Only</span>
                   </button>
                 )}
               </div>
@@ -716,6 +818,208 @@ export function CourseHubDashboard({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Academic Cohort & Institutional Switcher Modal */}
+      {showCohortModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/40 backdrop-blur-xs"
+          onClick={() => setShowCohortModal(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200/90 shadow-xl overflow-hidden animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100">
+              <div>
+                <h3 className="font-serif-display text-lg font-bold text-neutral-900 flex items-center gap-2">
+                  <span>🏛️</span>
+                  <span>Switch Academic Cohort</span>
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Segregate your courses, notes, and exams by institution type, department, and academic level.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCohortModal(false)}
+                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Institution Type Selector (Polytechnic vs University) */}
+              <div>
+                <label className="block text-xs font-bold text-neutral-700 mb-2">
+                  1. Institution Structure
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalInstType("polytechnic");
+                      const firstPoly = INSTITUTIONS.find((i) => i.type === "polytechnic") || INSTITUTIONS[0];
+                      setModalInstId(firstPoly.id);
+                      setModalDivision(firstPoly.divisions[0]?.name || "");
+                      setModalDepartment(firstPoly.divisions[0]?.departments[0] || "");
+                      setModalLevel(firstPoly.supportedLevels[0] || "ND 1");
+                    }}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      modalInstType === "polytechnic"
+                        ? "bg-[#006d64]/10 border-[#006d64] text-[#006d64] shadow-xs"
+                        : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100"
+                    }`}
+                  >
+                    <p className="text-xs font-black flex items-center gap-1.5">
+                      <span>⚙️</span> Polytechnic
+                    </p>
+                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                      ND 1, ND 2, HND 1, HND 2
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalInstType("university");
+                      const firstUniv = INSTITUTIONS.find((i) => i.type === "university") || INSTITUTIONS[2];
+                      setModalInstId(firstUniv.id);
+                      setModalDivision(firstUniv.divisions[0]?.name || "");
+                      setModalDepartment(firstUniv.divisions[0]?.departments[0] || "");
+                      setModalLevel(firstUniv.supportedLevels[0] || "100 Level");
+                    }}
+                    className={`p-3 rounded-xl border text-left transition-all ${
+                      modalInstType === "university"
+                        ? "bg-[#006d64]/10 border-[#006d64] text-[#006d64] shadow-xs"
+                        : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100"
+                    }`}
+                  >
+                    <p className="text-xs font-black flex items-center gap-1.5">
+                      <span>🎓</span> University
+                    </p>
+                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                      100L, 200L, 300L, 400L, 500L
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Institution Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  2. Select Institution
+                </label>
+                <select
+                  value={modalInstId}
+                  onChange={(e) => {
+                    const nextId = e.target.value;
+                    setModalInstId(nextId);
+                    const inst = getInstitutionById(nextId);
+                    if (inst) {
+                      setModalDivision(inst.divisions[0]?.name || "");
+                      setModalDepartment(inst.divisions[0]?.departments[0] || "");
+                      setModalLevel(inst.supportedLevels[0] || "100 Level");
+                    }
+                  }}
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                >
+                  {INSTITUTIONS.filter((i) => i.type === modalInstType).map((inst) => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.name} ({inst.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Division (School / Faculty) */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  3. {selectedInstObj.divisionLabel}
+                </label>
+                <select
+                  value={modalDivision}
+                  onChange={(e) => {
+                    const nextDiv = e.target.value;
+                    setModalDivision(nextDiv);
+                    const divObj = selectedInstObj.divisions.find((d) => d.name === nextDiv);
+                    if (divObj && divObj.departments.length > 0) {
+                      setModalDepartment(divObj.departments[0]);
+                    }
+                  }}
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                >
+                  {selectedInstObj.divisions.map((div) => (
+                    <option key={div.name} value={div.name}>
+                      {div.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Department */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  4. Department
+                </label>
+                <select
+                  value={modalDepartment}
+                  onChange={(e) => setModalDepartment(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                >
+                  {(activeDivisionObj?.departments || []).map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Academic Level (ND/HND for polytechnic, 100L-500L for university) */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                  5. Academic Level ({modalInstType === "polytechnic" ? "Polytechnic Track" : "University Track"})
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {selectedInstObj.supportedLevels.map((lvl) => {
+                    const isSelected = modalLevel === lvl;
+                    return (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => setModalLevel(lvl)}
+                        className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all ${
+                          isSelected
+                            ? "bg-[#006d64] text-white border-[#006d64] shadow-xs"
+                            : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100"
+                        }`}
+                      >
+                        {lvl}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setShowCohortModal(false)}
+                  className="px-4 py-2 rounded-xl text-neutral-600 hover:bg-neutral-100 text-xs font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApplyCohort}
+                  className="px-5 py-2 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white text-xs font-bold shadow-xs transition-colors"
+                >
+                  Apply Cohort Filter
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

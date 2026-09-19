@@ -163,8 +163,22 @@ export function TopNav({
           </nav>
         </div>
 
-        {/* Right side controls: Role Badge + Theme Switch + Avatar */}
-        <div className="flex items-center gap-3">
+        {/* Right side controls: Cohort Pill + Role Badge + Theme Switch + Avatar */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Institution & Cohort Pill */}
+          {currentUser.institutionId && (
+            <div
+              onClick={onOpenAuth}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-neutral-200 bg-neutral-50 text-[11px] font-semibold text-neutral-700 cursor-pointer hover:bg-neutral-100 transition-colors"
+              title={`${currentUser.institutionName || currentUser.institutionId} • ${currentUser.department} • ${currentUser.level}`}
+            >
+              <span className="w-2 h-2 rounded-full bg-[#006d64]" />
+              <span className="font-bold text-neutral-900">{currentUser.institutionId}</span>
+              <span className="text-neutral-400">•</span>
+              <span className="text-[#006d64] font-medium">{currentUser.level || "HND 1"}</span>
+            </div>
+          )}
+
           {/* Active Role Indicator Badge */}
           <div
             onClick={onOpenAuth}
@@ -232,17 +246,38 @@ export function TopNav({
                     </span>
                   </div>
                   <p className="text-[11px] text-neutral-500 font-mono">{currentUser.matricNo}</p>
-                  <p className="text-[11px] text-[#006d64] font-medium mt-0.5 truncate">
-                    {currentUser.department}
-                  </p>
+                  
+                  {/* Institution and Department information */}
+                  <div className="mt-2 p-2 rounded-xl bg-neutral-50 border border-neutral-100 space-y-1 text-[10px]">
+                    <div className="font-semibold text-neutral-800 truncate">
+                      🏛️ {currentUser.institutionName || (currentUser.institutionType === "polytechnic" ? "Federal Polytechnic Nekede" : "University of Lagos")}
+                    </div>
+                    {currentUser.facultyOrSchool && (
+                      <div className="text-neutral-500 truncate">
+                        {currentUser.facultyOrSchool}
+                      </div>
+                    )}
+                    <div className="text-[#006d64] font-medium flex items-center justify-between">
+                      <span className="truncate">{currentUser.department}</span>
+                      <span className="font-bold shrink-0 ml-1 px-1.5 py-0.2 rounded bg-neutral-200/60 text-neutral-700">{currentUser.level || "HND 1"}</span>
+                    </div>
+                  </div>
+
+                  {currentUser.role === "student" && (
+                    <div className="mt-1.5 px-2 py-1 rounded bg-neutral-100 text-[10px] text-neutral-600 flex items-center gap-1">
+                      <span>🔒</span>
+                      <span>Uploads restricted to Course Rep</span>
+                    </div>
+                  )}
+
                   {currentUser.repCourseCode && (
-                    <p className="text-[10px] text-amber-800 font-semibold mt-1 bg-amber-50 p-1 rounded">
-                      Rep: {currentUser.repCourseCode}
+                    <p className="text-[10px] text-amber-800 font-semibold mt-1.5 bg-amber-50 p-1.5 rounded border border-amber-200">
+                      📢 Rep: {currentUser.repCourseCode}
                     </p>
                   )}
                   {currentUser.staffTitle && (
-                    <p className="text-[10px] text-purple-800 font-semibold mt-1 bg-purple-50 p-1 rounded">
-                      {currentUser.staffTitle}
+                    <p className="text-[10px] text-purple-800 font-semibold mt-1.5 bg-purple-50 p-1.5 rounded border border-purple-200">
+                      🛡️ {currentUser.staffTitle}
                     </p>
                   )}
                 </div>

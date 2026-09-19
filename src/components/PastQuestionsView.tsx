@@ -9,8 +9,9 @@ import {
   FileText,
   Calendar,
   Layers,
+  Lock,
 } from "lucide-react";
-import { PastQuestionPaper, Course } from "../types";
+import { PastQuestionPaper, Course, UserProfile } from "../types";
 import { SESSIONS, EXAM_TYPES } from "../data/mockData";
 
 interface PastQuestionsViewProps {
@@ -19,6 +20,7 @@ interface PastQuestionsViewProps {
   onUploadClick: () => void;
   onPreviewPaper: (paper: PastQuestionPaper) => void;
   onDownloadPaper: (paper: PastQuestionPaper) => void;
+  currentUser?: UserProfile;
 }
 
 export function PastQuestionsView({
@@ -27,6 +29,7 @@ export function PastQuestionsView({
   onUploadClick,
   onPreviewPaper,
   onDownloadPaper,
+  currentUser,
 }: PastQuestionsViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("ALL");
@@ -65,13 +68,25 @@ export function PastQuestionsView({
           </p>
         </div>
 
-        <button
-          onClick={onUploadClick}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-[0.98] self-start sm:self-auto"
-        >
-          <Plus size={15} />
-          <span>Upload Exam Paper</span>
-        </button>
+        {currentUser?.role === "student" ? (
+          <button
+            onClick={onUploadClick}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-semibold shadow-xs transition-all active:scale-[0.98] self-start sm:self-auto"
+            title="Past paper archives are managed by Course Representatives"
+          >
+            <Lock size={14} className="text-amber-700" />
+            <span>Upload Paper (Rep Only)</span>
+          </button>
+        ) : (
+          <button
+            onClick={onUploadClick}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white text-xs font-semibold shadow-xs transition-all active:scale-[0.98] self-start sm:self-auto"
+            title="Upload and archive past exam papers"
+          >
+            <Plus size={15} />
+            <span>Upload Exam Paper</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Toolbar */}

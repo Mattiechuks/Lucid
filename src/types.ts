@@ -1,5 +1,22 @@
 export type GenerationStatus = "PENDING" | "PROCESSING" | "READY" | "FAILED";
 
+export type InstitutionType = "university" | "polytechnic";
+
+export interface DivisionStructure {
+  name: string; // e.g. "School of Information & Comm. Tech" or "Faculty of Computing & Informatics"
+  departments: string[];
+}
+
+export interface Institution {
+  id: string;
+  name: string;
+  shortName: string;
+  type: InstitutionType;
+  divisionLabel: "Faculty" | "School" | "College"; // "Faculty" for University, "School" for Polytechnic, "College" for collegiate universities
+  divisions: DivisionStructure[];
+  supportedLevels: string[]; // Poly: ["ND 1", "ND 2", "HND 1", "HND 2"], Univ: ["100 Level", "200 Level", "300 Level", "400 Level", "500 Level"]
+}
+
 export interface Flashcard {
   id?: string;
   q: string;
@@ -10,9 +27,13 @@ export interface Flashcard {
 export interface Course {
   code: string;
   title: string;
+  institutionType?: InstitutionType;
+  institutionId?: string; // e.g. "FEDPONEK", "UNILAG", "ALL"
+  institutionName?: string;
+  facultyOrSchool?: string;
   department?: string;
+  level?: string; // e.g. "ND 1", "ND 2", "HND 1", "HND 2", "100 Level", "200 Level", "300 Level", "400 Level", "500 Level"
   color?: string;
-  level?: string;
   starred?: boolean;
   units?: number;
   semester?: string;
@@ -44,6 +65,12 @@ export interface CourseNote {
   title: string;
   uploadedAt: string;
   status: GenerationStatus;
+  institutionType?: InstitutionType;
+  institutionId?: string;
+  institutionName?: string;
+  facultyOrSchool?: string;
+  department?: string;
+  level?: string;
   cardCount?: number;
   deck?: Flashcard[];
   error?: string;
@@ -55,6 +82,12 @@ export interface CourseNote {
   transcription?: string;
   summary?: string;
   cbtQuestions?: CBTQuestion[];
+  uploadedByRole?: UserRole;
+  uploadedByName?: string;
+  authorId?: string;
+  authorRole?: UserRole;
+  authorName?: string;
+  isRepVerified?: boolean;
 }
 
 export interface PastQuestionPaper {
@@ -65,7 +98,18 @@ export interface PastQuestionPaper {
   uploadedAt: string;
   fileName: string;
   fileSize?: string;
+  institutionType?: InstitutionType;
+  institutionId?: string;
+  institutionName?: string;
+  facultyOrSchool?: string;
+  department?: string;
+  level?: string;
   sampleQuestions?: string[];
+  uploadedByRole?: UserRole;
+  uploadedByName?: string;
+  authorId?: string;
+  authorRole?: UserRole;
+  authorName?: string;
 }
 
 export interface PracticalReport {
@@ -85,11 +129,17 @@ export type UserRole = "student" | "courserep" | "admin";
 
 export interface Announcement {
   id: string;
+  authorId?: string;
   authorName: string;
   authorRole: UserRole;
   title: string;
   content: string;
   courseCode?: string;
+  institutionType?: InstitutionType;
+  institutionId?: string;
+  institutionName?: string;
+  department?: string;
+  level?: string;
   date: string;
   pinned?: boolean;
 }
@@ -99,6 +149,10 @@ export interface UserProfile {
   name: string;
   matricNo: string;
   email: string;
+  institutionType?: InstitutionType;
+  institutionId?: string;
+  institutionName?: string;
+  facultyOrSchool?: string;
   department: string;
   level: string;
   avatarInitials: string;
@@ -111,6 +165,37 @@ export interface UserProfile {
   password?: string;
 }
 
-export type ActiveTab = "dashboard" | "notes" | "past" | "courses" | "cbt" | "practicals" | "admin";
+export type ActiveTab = "dashboard" | "notes" | "past" | "courses" | "cbt" | "practicals" | "admin" | "analytics";
 export type CBTMode = "objective" | "german" | "theory";
+
+export interface QuizResult {
+  id: string;
+  userId: string;
+  userName?: string;
+  courseCode: string;
+  courseTitle?: string;
+  mode: CBTMode;
+  score: number;
+  total: number;
+  percentage: number;
+  durationSeconds: number;
+  completedAt: string;
+  institutionId?: string;
+  department?: string;
+  level?: string;
+}
+
+export interface UserAnalytics {
+  userId: string;
+  totalQuizzesTaken: number;
+  averageScore: number;
+  bestScore: number;
+  currentStreakDays: number;
+  lastActiveDate: string;
+  notesStudiedCount: number;
+  pastQuestionsViewedCount: number;
+  history: QuizResult[];
+}
+
+
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   ActiveTab,
   CourseNote,
@@ -8,6 +8,7 @@ import {
   UserProfile,
   CBTMode,
   Announcement,
+  InstitutionType,
 } from "./types";
 import {
   COURSES,
@@ -36,6 +37,19 @@ import { CBTQuizModal } from "./components/CBTQuizModal";
 import { PracticalReportsModal } from "./components/PracticalReportsModal";
 import { LandingAuthPage } from "./components/LandingAuthPage";
 import { AdminUserProvisioningModal } from "./components/AdminUserProvisioningModal";
+import { UploadRestrictedModal } from "./components/UploadRestrictedModal";
+import {
+  uploadCourseNote,
+  uploadPastQuestionPaper,
+  publishAnnouncement,
+  subscribeToCohortNotes,
+  subscribeToCohortPapers,
+  subscribeToCohortAnnouncements,
+  seedCohortIfEmpty,
+  syncUserProfile,
+  logOutFromFirebase,
+} from "./lib/firebase";
+import { ALL_INSTITUTION_COURSES } from "./data/institutionsData";
 import { Check } from "lucide-react";
 
 const LOGGED_OUT_GUEST: UserProfile = {
@@ -150,6 +164,10 @@ export default function App() {
   const [openNoteId, setOpenNoteId] = useState<string | null>(null);
   const [showUploadNote, setShowUploadNote] = useState(false);
   const [showUploadPaper, setShowUploadPaper] = useState(false);
+  const [restrictedUploadAttempt, setRestrictedUploadAttempt] = useState<{
+    isOpen: boolean;
+    type: "note" | "paper";
+  } | null>(null);
   const [previewPaper, setPreviewPaper] = useState<PastQuestionPaper | null>(null);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [downloadToast, setDownloadToast] = useState<string | null>(null);
@@ -157,6 +175,108 @@ export default function App() {
 
   // Active timers tracking
   const timers = useRef<NodeJS.Timeout[]>([]);
+
+  // Dynamically resolve courses matching active institutional cohort (Polytechnic ND/HND vs University 100L-500L)
+  const activeCourses = useMemo(() => {
+    const instId = currentUser.institutionId || "FEDPONEK";
+    const userLevel = currentUser.level || "HND 1";
+    const filtered = ALL_INSTITUTION_COURSES.filter((c) => {
+      const matchesInst = !c.institutionId || c.institutionId === instId;
+      const matchesLevel =
+        !c.level ||
+        c.level === userLevel ||
+        userLevel.includes(c.level) ||
+        c.level.includes(userLevel);
+      return matchesInst && matchesLevel;
+    });
+    return filtered.length > 0 ? filtered : COURSES;
+  }, [currentUser.institutionId, currentUser.level]);
+
+  // Keep selectedCourse in sync if cohort changes
+  useEffect(() => {
+    if (activeCourses.length > 0 && !activeCourses.some((c) => c.code === selectedCourse.code)) {
+      setSelectedCourse(activeCourses[0]);
+    }
+  }, [activeCourses, selectedCourse]);
+
+  // Real-time Firestore synchronization for institutional multi-tenancy & multi-device sync
+  useEffect(() => {
+    const instId = currentUser.institutionId || "FEDPONEK";
+    const dept = currentUser.department || "Software & Web Development";
+    const lvl = currentUser.level || "HND 1";
+
+    // Initial seed if cloud collection for this cohort is empty
+    seedCohortIfEmpty(
+      instId,
+      dept,
+      lvl,
+      INITIAL_NOTES,
+      INITIAL_PAST_QUESTIONS,
+      INITIAL_ANNOUNCEMENTS
+    );
+
+    const unsubNotes = subscribeToCohortNotes(instId, dept, lvl, (cloudNotes) => {
+      if (cloudNotes && cloudNotes.length > 0) {
+        setNotes((prev) => {
+          const map = new Map<string, CourseNote>();
+          prev.forEach((n) => map.set(n.id, n));
+          cloudNotes.forEach((n) => map.set(n.id, n));
+          return Array.from(map.values());
+        });
+      }
+    });
+
+    const unsubPapers = subscribeToCohortPapers(instId, dept, lvl, (cloudPapers) => {
+      if (cloudPapers && cloudPapers.length > 0) {
+        setPapers((prev) => {
+          const map = new Map<string, PastQuestionPaper>();
+          prev.forEach((p) => map.set(p.id, p));
+          cloudPapers.forEach((p) => map.set(p.id, p));
+          return Array.from(map.values());
+        });
+      }
+    });
+
+    const unsubAnn = subscribeToCohortAnnouncements(instId, dept, lvl, (cloudAnn) => {
+      if (cloudAnn && cloudAnn.length > 0) {
+        setAnnouncements((prev) => {
+          const map = new Map<string, Announcement>();
+          prev.forEach((a) => map.set(a.id, a));
+          cloudAnn.forEach((a) => map.set(a.id, a));
+          return Array.from(map.values());
+        });
+      }
+    });
+
+    return () => {
+      unsubNotes();
+      unsubPapers();
+      unsubAnn();
+    };
+  }, [currentUser.institutionId, currentUser.department, currentUser.level]);
+
+  // Cohort switcher callback
+  const handleCohortSwitched = (cohort: {
+    institutionType: InstitutionType;
+    institutionId: string;
+    institutionName: string;
+    facultyOrSchool: string;
+    department: string;
+    level: string;
+  }) => {
+    setCurrentUser((prev) => {
+      const updated = {
+        ...prev,
+        ...cohort,
+      };
+      syncUserProfile(updated);
+      return updated;
+    });
+    setDownloadToast(
+      `Switched cohort: ${cohort.institutionId} • ${cohort.level} (${cohort.department})`
+    );
+    setTimeout(() => setDownloadToast(null), 3500);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -195,16 +315,31 @@ export default function App() {
     setTimeout(() => setDownloadToast(null), 3000);
   };
 
-  const handleAddAnnouncement = (newAnn: Announcement) => {
-    setAnnouncements((prev) => [newAnn, ...prev]);
+  const handleAddAnnouncement = async (newAnn: Announcement) => {
+    const annWithCohort: Announcement = {
+      ...newAnn,
+      authorId: currentUser.id,
+      authorRole: currentUser.role,
+      institutionId: currentUser.institutionId || "FEDPONEK",
+      department: currentUser.department,
+      level: currentUser.level,
+    };
+    setAnnouncements((prev) => [annWithCohort, ...prev]);
     setDownloadToast(`Published notice: ${newAnn.title}`);
     setTimeout(() => setDownloadToast(null), 3500);
+
+    try {
+      await publishAnnouncement(annWithCohort, currentUser);
+    } catch (err) {
+      console.warn("Cloud announcement write status:", err);
+    }
   };
 
   const handleLoginSuccess = (user: UserProfile) => {
     setCurrentUser(user);
     setIsGuestExploring(false);
     localStorage.setItem("lucid_user", JSON.stringify(user));
+    syncUserProfile(user);
     const roleLabel =
       user.role === "admin"
         ? "ADMINISTRATOR"
@@ -219,6 +354,7 @@ export default function App() {
     setCurrentUser(LOGGED_OUT_GUEST);
     setIsGuestExploring(false);
     localStorage.removeItem("lucid_user");
+    logOutFromFirebase();
     setDownloadToast("Signed out. Welcome back to the Lucid landing portal!");
     setTimeout(() => setDownloadToast(null), 3000);
   };
@@ -240,6 +376,38 @@ export default function App() {
       timers.current.forEach(clearTimeout);
     };
   }, []);
+
+  // Handlers for initiating note / paper uploads (strictly enforcing course rep privilege)
+  const handleInitiateNoteUpload = () => {
+    if (currentUser.role === "student") {
+      setRestrictedUploadAttempt({ isOpen: true, type: "note" });
+    } else {
+      setShowUploadNote(true);
+    }
+  };
+
+  const handleInitiatePaperUpload = () => {
+    if (currentUser.role === "student") {
+      setRestrictedUploadAttempt({ isOpen: true, type: "paper" });
+    } else {
+      setShowUploadPaper(true);
+    }
+  };
+
+  const handleSwitchToRepFromRestriction = () => {
+    const repUser =
+      currentUser.institutionType === "university"
+        ? DEMO_USERS.uni_courserep
+        : DEMO_USERS.courserep;
+    handleLoginSuccess(repUser);
+    const targetType = restrictedUploadAttempt?.type;
+    setRestrictedUploadAttempt(null);
+    if (targetType === "note") {
+      setShowUploadNote(true);
+    } else if (targetType === "paper") {
+      setShowUploadPaper(true);
+    }
+  };
 
   // Flashcard Generation Pipeline
   const runGeneration = async (
@@ -319,8 +487,8 @@ export default function App() {
     timers.current.push(tFallback);
   };
 
-  // Upload note handler
-  const handleUploadNote = ({
+  // Upload note handler (RBAC protected: Reps and Admins only)
+  const handleUploadNote = async ({
     course,
     title,
     fileName,
@@ -333,6 +501,11 @@ export default function App() {
     rawText?: string;
     sourceType: "file" | "paste" | "handwritten";
   }) => {
+    if (currentUser.role === "student") {
+      setRestrictedUploadAttempt({ isOpen: true, type: "note" });
+      return;
+    }
+
     const newId = `note-${Date.now()}`;
     const newNote: CourseNote = {
       id: newId,
@@ -343,11 +516,23 @@ export default function App() {
       sourceType,
       uploadedAt: new Date().toISOString().slice(0, 10),
       status: "PENDING",
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorRole: currentUser.role,
+      institutionId: currentUser.institutionId || "FEDPONEK",
+      department: currentUser.department,
+      level: currentUser.level,
     };
 
     setNotes((prev) => [newNote, ...prev]);
     setShowUploadNote(false);
     runGeneration(newId, course, title, rawText);
+
+    try {
+      await uploadCourseNote(newNote, currentUser);
+    } catch (err) {
+      console.warn("Cloud note upload status:", err);
+    }
   };
 
   // Handwritten note saved callback
@@ -380,8 +565,8 @@ export default function App() {
     }
   };
 
-  // Upload paper handler
-  const handleUploadPaper = ({
+  // Upload paper handler (RBAC protected: Reps and Admins only)
+  const handleUploadPaper = async ({
     course,
     session,
     examType,
@@ -392,6 +577,11 @@ export default function App() {
     examType: "First CA" | "Second CA" | "Final Exam";
     fileName: string;
   }) => {
+    if (currentUser.role === "student") {
+      setRestrictedUploadAttempt({ isOpen: true, type: "paper" });
+      return;
+    }
+
     const newPaper: PastQuestionPaper = {
       id: `pq-${Date.now()}`,
       course,
@@ -404,10 +594,21 @@ export default function App() {
         `Question 1: Comprehensively analyze the principal methodologies tested in ${course} and discuss implementation constraints.`,
         `Question 2: State and prove the foundational theorem introduced in the ${session} academic session for ${course}.`,
       ],
+      authorId: currentUser.id,
+      authorRole: currentUser.role,
+      institutionId: currentUser.institutionId || "FEDPONEK",
+      department: currentUser.department,
+      level: currentUser.level,
     };
 
     setPapers((prev) => [newPaper, ...prev]);
     setShowUploadPaper(false);
+
+    try {
+      await uploadPastQuestionPaper(newPaper, currentUser);
+    } catch (err) {
+      console.warn("Cloud paper upload status:", err);
+    }
   };
 
   // Download simulation
@@ -479,9 +680,9 @@ export default function App() {
         }}
         notesCount={notes.length}
         papersCount={papers.length}
-        coursesCount={COURSES.length}
-        onUploadNoteClick={() => setShowUploadNote(true)}
-        onUploadPaperClick={() => setShowUploadPaper(true)}
+        coursesCount={activeCourses.length}
+        onUploadNoteClick={handleInitiateNoteUpload}
+        onUploadPaperClick={handleInitiatePaperUpload}
         onOpenHandwrittenConverter={() => setShowHandwrittenConverter(true)}
         onOpenAuth={() => {
           setAuthModalMode("signin");
@@ -496,22 +697,23 @@ export default function App() {
 
       {/* Main Content Areas */}
       <div className="flex-1">
-        {/* Course Hub Primary Dashboard matching the user's screenshot */}
+        {/* Course Hub Primary Dashboard */}
         {activeTab === "dashboard" && (
           <CourseHubDashboard
-            courses={COURSES}
+            courses={activeCourses}
             activeCourse={selectedCourse}
             onSelectCourse={(course) => setSelectedCourse(course)}
             onStartStudy={handleStartStudyForCourse}
             onOpenCBTQuiz={(course, mode) => setCbtQuizState({ isOpen: true, course, mode })}
             onOpenPracticalReports={(course) => setPracticalReportState({ isOpen: true, course })}
             onOpenHandwrittenConverter={() => setShowHandwrittenConverter(true)}
-            onUploadNoteClick={() => setShowUploadNote(true)}
+            onUploadNoteClick={handleInitiateNoteUpload}
             notes={notes}
             currentUser={currentUser}
             announcements={announcements}
             onAddAnnouncement={handleAddAnnouncement}
             onOpenUserProvisioning={() => setShowUserProvisioningModal(true)}
+            onSwitchCohort={handleCohortSwitched}
           />
         )}
 
@@ -527,11 +729,12 @@ export default function App() {
         {activeTab === "notes" && !openNoteId ? (
           <NotesView
             notes={notes}
-            courses={COURSES}
-            onUploadClick={() => setShowUploadNote(true)}
+            courses={activeCourses}
+            onUploadClick={handleInitiateNoteUpload}
             onOpenDeck={(note) => setOpenNoteId(note.id)}
             onRetry={handleRetry}
             onDeleteNote={handleDeleteNote}
+            currentUser={currentUser}
           />
         ) : null}
 
@@ -539,21 +742,22 @@ export default function App() {
         {activeTab === "past" ? (
           <PastQuestionsView
             papers={papers}
-            courses={COURSES}
-            onUploadClick={() => setShowUploadPaper(true)}
+            courses={activeCourses}
+            onUploadClick={handleInitiatePaperUpload}
             onPreviewPaper={(paper) => setPreviewPaper(paper)}
             onDownloadPaper={handleDownloadPaper}
+            currentUser={currentUser}
           />
         ) : null}
 
         {/* Course Catalog View */}
         {activeTab === "courses" ? (
           <CourseCatalogView
-            courses={COURSES}
+            courses={activeCourses}
             notes={notes}
             papers={papers}
             onSelectCourseForNotes={(code) => {
-              const matched = COURSES.find((c) => c.code === code);
+              const matched = activeCourses.find((c) => c.code === code);
               if (matched) setSelectedCourse(matched);
               setActiveTab("dashboard");
             }}
@@ -636,7 +840,7 @@ export default function App() {
         isOpen={showUserProvisioningModal}
         onClose={() => setShowUserProvisioningModal(false)}
         currentUser={currentUser}
-        courses={COURSES}
+        courses={activeCourses}
         usersRoster={usersRoster}
         onProvisionUser={handleProvisionUser}
         onRevokeUser={handleRevokeUser}
@@ -645,7 +849,7 @@ export default function App() {
       {/* Handwritten Note Converter & Camera Modal */}
       {showHandwrittenConverter && (
         <HandwrittenConverterModal
-          courses={COURSES}
+          courses={activeCourses}
           activeCourseCode={selectedCourse.code}
           onClose={() => setShowHandwrittenConverter(false)}
           onSavedNote={handleHandwrittenNoteSaved}
@@ -657,6 +861,11 @@ export default function App() {
         <CBTQuizModal
           course={cbtQuizState.course}
           initialMode={cbtQuizState.mode}
+          currentUser={currentUser}
+          onAnalyticsUpdated={(analytics) => {
+            setDownloadToast(`🔥 Study streak recorded! ${analytics.currentStreakDays}-day streak active.`);
+            setTimeout(() => setDownloadToast(null), 3500);
+          }}
           onClose={() => setCbtQuizState(null)}
         />
       )}
@@ -669,22 +878,33 @@ export default function App() {
         />
       )}
 
-      {/* Upload Note Modal */}
+      {/* Role-Based Access Control Restriction Notice Modal */}
+      <UploadRestrictedModal
+        isOpen={restrictedUploadAttempt?.isOpen || false}
+        contentType={restrictedUploadAttempt?.type || "note"}
+        onClose={() => setRestrictedUploadAttempt(null)}
+        onSwitchToCourseRep={handleSwitchToRepFromRestriction}
+        currentUser={currentUser}
+      />
+
+      {/* Upload Note Modal (Rep & Admin Authorized) */}
       {showUploadNote && (
         <UploadNoteModal
-          courses={COURSES}
+          courses={activeCourses}
           onClose={() => setShowUploadNote(false)}
           onOpenHandwritten={() => setShowHandwrittenConverter(true)}
           onSubmit={handleUploadNote}
+          currentUser={currentUser}
         />
       )}
 
-      {/* Upload Paper Modal */}
+      {/* Upload Paper Modal (Rep & Admin Authorized) */}
       {showUploadPaper && (
         <UploadPaperModal
-          courses={COURSES}
+          courses={activeCourses}
           onClose={() => setShowUploadPaper(false)}
           onSubmit={handleUploadPaper}
+          currentUser={currentUser}
         />
       )}
 

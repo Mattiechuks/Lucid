@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "Registered scholar, course representative, or departmental administrator profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "matricNo": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "courserep", "admin"] },
+        "institutionType": { "type": "string", "enum": ["polytechnic", "university"] },
+        "institutionId": { "type": "string" },
+        "institutionName": { "type": "string" },
+        "facultyOrSchool": { "type": "string" },
+        "department": { "type": "string" },
+        "level": { "type": "string" },
+        "repCourseCode": { "type": "string" },
+        "staffTitle": { "type": "string" },
+        "avatarInitials": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "matricNo", "email", "role", "institutionId", "department", "level"]
+    },
+    "courseNote": {
+      "title": "CourseNote",
+      "description": "Syllabus lecture notes and AI flashcard decks uploaded strictly by Course Reps or Admins",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "course": { "type": "string" },
+        "title": { "type": "string" },
+        "uploadedAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["READY", "PROCESSING", "FAILED"] },
+        "cardCount": { "type": "number" },
+        "sourceType": { "type": "string", "enum": ["file", "raw", "handwritten"] },
+        "fileName": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorRole": { "type": "string", "enum": ["courserep", "admin"] },
+        "institutionId": { "type": "string" },
+        "department": { "type": "string" },
+        "level": { "type": "string" },
+        "semester": { "type": "string" }
+      },
+      "required": ["id", "course", "title", "uploadedAt", "status", "authorRole", "institutionId", "department", "level"]
+    },
+    "pastQuestionPaper": {
+      "title": "PastQuestionPaper",
+      "description": "Continuous assessment and semester examination past papers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "course": { "type": "string" },
+        "title": { "type": "string" },
+        "session": { "type": "string" },
+        "examType": { "type": "string", "enum": ["FIRST_SEMESTER_EXAM", "SECOND_SEMESTER_EXAM", "MID_SEMESTER_TEST", "CBT_TEST"] },
+        "fileName": { "type": "string" },
+        "uploadedAt": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorRole": { "type": "string", "enum": ["courserep", "admin"] },
+        "institutionId": { "type": "string" },
+        "department": { "type": "string" },
+        "level": { "type": "string" }
+      },
+      "required": ["id", "course", "title", "session", "examType", "authorRole", "institutionId", "department", "level"]
+    },
+    "announcement": {
+      "title": "Announcement",
+      "description": "Departmental and course notifications published by Course Reps or Admins",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "date": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorRole": { "type": "string", "enum": ["courserep", "admin"] },
+        "pinned": { "type": "boolean" },
+        "institutionId": { "type": "string" },
+        "department": { "type": "string" },
+        "level": { "type": "string" }
+      },
+      "required": ["id", "title", "content", "authorRole", "institutionId", "department", "level"]
+    },
+    "quizResult": {
+      "title": "QuizResult",
+      "description": "CBT test performance results and score metrics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "courseCode": { "type": "string" },
+        "mode": { "type": "string", "enum": ["objective", "german", "theory"] },
+        "score": { "type": "number" },
+        "total": { "type": "number" },
+        "percentage": { "type": "number" },
+        "durationSeconds": { "type": "number" },
+        "completedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "courseCode", "score", "total", "percentage"]
+    },
+    "userAnalytics": {
+      "title": "UserAnalytics",
+      "description": "Student persistent aggregate analytics and study streak statistics",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "totalQuizzesTaken": { "type": "number" },
+        "averageScore": { "type": "number" },
+        "bestScore": { "type": "number" },
+        "currentStreakDays": { "type": "number" },
+        "lastActiveDate": { "type": "string" }
+      },
+      "required": ["userId", "totalQuizzesTaken", "currentStreakDays"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profile documents"
+    },
+    "/notes/{noteId}": {
+      "schema": "courseNote",
+      "description": "Class lecture notes and generated flashcard decks"
+    },
+    "/past_questions/{paperId}": {
+      "schema": "pastQuestionPaper",
+      "description": "Semester exam and CBT test papers"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "announcement",
+      "description": "Cohorted course and department announcements"
+    },
+    "/quiz_results/{resultId}": {
+      "schema": "quizResult",
+      "description": "Individual CBT quiz test performance submissions"
+    },
+    "/analytics/{userId}": {
+      "schema": "userAnalytics",
+      "description": "Aggregated scholar study statistics and streaks"
+    }
+  }
+}

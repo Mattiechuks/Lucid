@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="lucidGradMask" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#006d64"/>
+      <stop offset="50%" stop-color="#0e8276"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#lucidGradMask)"/>
+  <!-- Centered Monogram "L" within safe zone -->
+  <path d="M 180 150 L 220 150 L 220 320 L 340 320 L 340 360 L 180 360 Z" fill="#ffffff" />
+  <path d="M 320 165 Q 350 165 350 135 Q 350 165 380 165 Q 350 165 350 195 Q 350 165 320 165 Z" fill="#fde047" />
+  <circle cx="280" cy="240" r="10" fill="#a7f3d0" />
+</svg>

@@ -13,8 +13,9 @@ import {
   CheckCircle2,
   AlertCircle,
   FileCode,
+  Lock,
 } from "lucide-react";
-import { CourseNote, Course } from "../types";
+import { CourseNote, Course, UserProfile } from "../types";
 import { StatusBadge } from "./StatusBadge";
 
 interface NotesViewProps {
@@ -25,6 +26,7 @@ interface NotesViewProps {
   onRetry: (id: string) => void;
   onDeleteNote: (id: string) => void;
   onFilterByCourse?: string | null;
+  currentUser?: UserProfile;
 }
 
 export function NotesView({
@@ -35,6 +37,7 @@ export function NotesView({
   onRetry,
   onDeleteNote,
   onFilterByCourse = null,
+  currentUser,
 }: NotesViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<string>(onFilterByCourse || "ALL");
@@ -93,13 +96,25 @@ export function NotesView({
             </div>
           </div>
 
-          <button
-            onClick={onUploadClick}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-xs transition-all active:scale-[0.98]"
-          >
-            <Plus size={15} />
-            <span>Upload Note</span>
-          </button>
+          {currentUser?.role === "student" ? (
+            <button
+              onClick={onUploadClick}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-semibold shadow-xs transition-all active:scale-[0.98]"
+              title="Course note uploads are restricted to Course Representatives"
+            >
+              <Lock size={14} className="text-amber-700" />
+              <span>Upload Note (Rep Only)</span>
+            </button>
+          ) : (
+            <button
+              onClick={onUploadClick}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white text-xs font-semibold shadow-xs transition-all active:scale-[0.98]"
+              title="Upload course lecture notes and build study decks"
+            >
+              <Plus size={15} />
+              <span>Upload Note</span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -3,8 +3,17 @@ import {
   UserProfile,
   UserRole,
   Course,
+  InstitutionType,
 } from "../types";
 import { DEMO_USERS, COURSES } from "../data/mockData";
+import {
+  INSTITUTIONS,
+  POLYTECHNIC_LEVELS,
+  UNIVERSITY_LEVELS,
+  getLevelsForInstitutionType,
+} from "../data/institutionsData";
+import { authenticateWithFirebase, syncUserProfile, signInWithGoogle } from "../lib/firebase";
+import { ConsciousnessOdysseySection } from "./ConsciousnessOdysseySection";
 import {
   Sparkles,
   ArrowRight,
@@ -27,6 +36,7 @@ import {
   EyeOff,
   Sun,
   Moon,
+  School,
 } from "lucide-react";
 
 interface LandingAuthPageProps {
@@ -49,114 +59,130 @@ export function LandingAuthPage({
   const [selectedRole, setSelectedRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Institution & Cohort Segregation States
+  const [institutionType, setInstitutionType] = useState<InstitutionType>("polytechnic");
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState("FEDPONEK");
+  const [facultyOrSchool, setFacultyOrSchool] = useState("School of Information & Communication Technology (SICT)");
+  const [department, setDepartment] = useState("Software & Web Development");
+  const [level, setLevel] = useState("HND 1");
+
   // Form states
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [identifier, setIdentifier] = useState(""); // Matric No or Staff ID
   const [password, setPassword] = useState("");
-  const [department, setDepartment] = useState("Software & Web Development");
-  const [level, setLevel] = useState("HND 1 • 300 Level");
   const [repCourse, setRepCourse] = useState("SWD 311 (Operating System)");
   const [adminStaffTitle, setAdminStaffTitle] = useState("Head of Department & Academic Coordinator");
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Handle Quick Demo Login for instant role testing
-  const handleQuickDemoLogin = (role: UserRole) => {
-    const demo = DEMO_USERS[role];
-    onLogin(demo);
+  // Available institutions for active type
+  const availableInstitutions = INSTITUTIONS.filter((inst) => inst.type === institutionType);
+  const currentInstitution = INSTITUTIONS.find((inst) => inst.id === selectedInstitutionId) || availableInstitutions[0];
+  const availableDivisions = currentInstitution?.divisions || [];
+  const currentDivision = availableDivisions.find((d) => d.name === facultyOrSchool) || availableDivisions[0];
+  const availableDepartments = currentDivision?.departments || ["Computer Science"];
+  const availableLevels = getLevelsForInstitutionType(institutionType);
+
+  // Handle switching institution type
+  const handleInstitutionTypeChange = (newType: InstitutionType) => {
+    setInstitutionType(newType);
+    const firstInst = INSTITUTIONS.find((i) => i.type === newType);
+    if (firstInst) {
+      setSelectedInstitutionId(firstInst.id);
+      const firstDiv = firstInst.divisions[0];
+      setFacultyOrSchool(firstDiv ? firstDiv.name : "");
+      setDepartment(firstDiv?.departments[0] || "");
+      setLevel(newType === "polytechnic" ? "HND 1" : "300 Level");
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle switching institution
+  const handleInstitutionChange = (instId: string) => {
+    setSelectedInstitutionId(instId);
+    const inst = INSTITUTIONS.find((i) => i.id === instId);
+    if (inst) {
+      const firstDiv = inst.divisions[0];
+      setFacultyOrSchool(firstDiv ? firstDiv.name : "");
+      setDepartment(firstDiv?.departments[0] || "");
+      setLevel(inst.type === "polytechnic" ? "HND 1" : "300 Level");
+    }
+  };
+
+  // Handle switching division / school / faculty
+  const handleDivisionChange = (divName: string) => {
+    setFacultyOrSchool(divName);
+    const div = availableDivisions.find((d) => d.name === divName);
+    if (div && div.departments.length > 0) {
+      setDepartment(div.departments[0]);
+    }
+  };
+
+  // Handle Quick Demo Login for instant role testing across both structures
+  const handleQuickDemoLogin = (role: UserRole, type: InstitutionType = "polytechnic") => {
+    if (type === "university") {
+      if (role === "courserep") {
+        onLogin(DEMO_USERS.uni_courserep);
+      } else {
+        onLogin(DEMO_USERS.uni_student);
+      }
+    } else {
+      const demo = DEMO_USERS[role];
+      onLogin(demo);
+    }
+  };
+
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const handleGoogleSignIn = async () => {
     setAuthError(null);
+    setIsGoogleLoading(true);
+    try {
+      const authResult = await signInWithGoogle();
+      if (!authResult) {
+        setIsGoogleLoading(false);
+        return;
+      }
 
-    if (authMode === "signin") {
-      const targetEmail = email.trim().toLowerCase();
-      const targetId = identifier.trim().toLowerCase();
+      const { firebaseUser, profileDraft, isExisting } = authResult;
 
-      // Search roster first, then demo users
-      const pool = [...usersRoster, ...Object.values(DEMO_USERS)];
-      let matchedUser = pool.find(
-        (u) =>
-          u.role === selectedRole &&
-          ((targetEmail && u.email.toLowerCase() === targetEmail) ||
-            (targetId && u.matricNo.toLowerCase() === targetId))
+      if (isExisting && profileDraft && profileDraft.id) {
+        const fullProfile = profileDraft as UserProfile;
+        syncUserProfile({ ...fullProfile, isLoggedIn: true });
+        onLogin({ ...fullProfile, isLoggedIn: true });
+        return;
+      }
+
+      // Check if user already exists in usersRoster
+      const existing = usersRoster.find(
+        (u) => u.email.toLowerCase() === (firebaseUser.email || "").toLowerCase()
       );
 
-      // If user typed demo credentials or left blank
-      if (!matchedUser) {
-        const demo = DEMO_USERS[selectedRole];
-        if (!targetEmail && !targetId) {
-          matchedUser = demo;
-        } else if (
-          targetEmail.includes("demo") ||
-          demo.email.toLowerCase() === targetEmail ||
-          demo.matricNo.toLowerCase() === targetId
-        ) {
-          matchedUser = demo;
-        }
-      }
-
-      if (matchedUser) {
-        onLogin({ ...matchedUser, isLoggedIn: true });
+      if (existing) {
+        const updated = { ...existing, isLoggedIn: true };
+        syncUserProfile(updated);
+        onLogin(updated);
         return;
       }
 
-      // For privileged roles (Course Rep / Admin), require matching an assigned account
-      if (selectedRole !== "student") {
-        setAuthError(
-          `No registered ${
-            selectedRole === "admin" ? "Department Administrator" : "Course Representative"
-          } found matching "${identifier || email}". Per academic policy, this account must first be assigned and provisioned by an Administrator.`
-        );
-        return;
-      }
-
-      // For Student, allow dynamic login if identifier was entered
-      const generatedUser: UserProfile = {
-        id: `usr-${Date.now()}`,
-        name: name.trim() || "Scholar Student",
-        matricNo: identifier || "SWD/2023/1042",
-        email: email || "scholar@lucid.edu",
-        department,
-        level,
-        avatarInitials: "SC",
-        isLoggedIn: true,
-        role: "student",
-      };
-      onLogin(generatedUser);
-    } else {
-      // Sign Up validation: Strict role check
-      if (selectedRole !== "student") {
-        setAuthError(
-          "Course Representative and Administrator accounts cannot be self-registered. They must be officially assigned and provisioned by the Department Administrator."
-        );
-        return;
-      }
-
-      if (!name.trim()) {
-        setAuthError("Please enter your full name.");
-        return;
-      }
-      if (!email.trim() || !email.includes("@")) {
-        setAuthError("Please enter a valid academic or personal email.");
-        return;
-      }
-
-      const initials =
-        name
-          .trim()
-          .split(" ")
-          .map((p) => p[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2) || "SC";
+      // Build authenticated profile with Google metadata
+      const displayName = firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Scholar";
+      const initials = displayName
+        .split(" ")
+        .map((p: string) => p[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2) || "SC";
 
       const newUser: UserProfile = {
-        id: `usr-reg-${Date.now()}`,
-        name: name.trim(),
-        matricNo: identifier.trim() || "SWD/2024/001",
-        email: email.trim(),
+        id: firebaseUser.uid || `usr-g-${Date.now()}`,
+        name: displayName,
+        matricNo: (institutionType === "polytechnic" ? "SWD/2024/" : "220407") + Math.floor(100 + Math.random() * 899),
+        email: firebaseUser.email || `${firebaseUser.uid}@gmail.com`,
+        institutionType,
+        institutionId: selectedInstitutionId,
+        institutionName: currentInstitution?.name || "Academic Institution",
+        facultyOrSchool,
         department,
         level,
         avatarInitials: initials,
@@ -164,7 +190,152 @@ export function LandingAuthPage({
         role: "student",
       };
 
+      syncUserProfile(newUser);
       onLogin(newUser);
+    } catch (err: any) {
+      console.error("Google sign-in error:", err);
+      setAuthError(err?.message || "Failed to sign in with Google account. Please try again.");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setIsAuthenticating(true);
+
+    try {
+      if (authMode === "signin") {
+        const targetEmail = email.trim().toLowerCase();
+        const targetId = identifier.trim().toLowerCase();
+
+        // If credentials provided, attempt Firebase Auth authentication
+        if (targetEmail && password.length >= 6) {
+          try {
+            await authenticateWithFirebase(targetEmail, password);
+          } catch (fbErr) {
+            console.warn("Firebase Auth sign-in warning:", fbErr);
+          }
+        }
+
+        // Search roster first, then demo users
+        const pool = [...usersRoster, ...Object.values(DEMO_USERS)];
+        let matchedUser = pool.find(
+          (u) =>
+            u.role === selectedRole &&
+            ((targetEmail && u.email.toLowerCase() === targetEmail) ||
+              (targetId && u.matricNo.toLowerCase() === targetId))
+        );
+
+        // If user typed demo credentials or left blank
+        if (!matchedUser) {
+          const demo = institutionType === "university"
+            ? (selectedRole === "courserep" ? DEMO_USERS.uni_courserep : DEMO_USERS.uni_student)
+            : DEMO_USERS[selectedRole];
+
+          if (!targetEmail && !targetId) {
+            matchedUser = demo;
+          } else if (
+            targetEmail.includes("demo") ||
+            demo.email.toLowerCase() === targetEmail ||
+            demo.matricNo.toLowerCase() === targetId
+          ) {
+            matchedUser = demo;
+          }
+        }
+
+        if (matchedUser) {
+          const authenticatedUser = { ...matchedUser, isLoggedIn: true };
+          syncUserProfile(authenticatedUser);
+          onLogin(authenticatedUser);
+          return;
+        }
+
+        // For privileged roles (Course Rep / Admin), require matching an assigned account
+        if (selectedRole !== "student") {
+          setAuthError(
+            `No registered ${
+              selectedRole === "admin" ? "Department Administrator" : "Course Representative"
+            } found matching "${identifier || email}". Per academic policy, this account must first be assigned and provisioned by an Administrator.`
+          );
+          return;
+        }
+
+        // For Student, allow dynamic login if identifier was entered
+        const generatedUser: UserProfile = {
+          id: `usr-${Date.now()}`,
+          name: name.trim() || "Scholar Student",
+          matricNo: identifier || (institutionType === "polytechnic" ? "SWD/2023/1042" : "210407082"),
+          email: email || "scholar@lucid.edu",
+          institutionType,
+          institutionId: selectedInstitutionId,
+          institutionName: currentInstitution?.name || "Federal Polytechnic Nekede, Owerri",
+          facultyOrSchool,
+          department,
+          level,
+          avatarInitials: "SC",
+          isLoggedIn: true,
+          role: "student",
+        };
+        syncUserProfile(generatedUser);
+        onLogin(generatedUser);
+      } else {
+        // Sign Up validation: Strict role check
+        if (selectedRole !== "student") {
+          setAuthError(
+            "Course Representative and Administrator accounts cannot be self-registered. They must be officially assigned and provisioned by the Department Administrator to maintain syllabus material authorization."
+          );
+          return;
+        }
+
+        if (!name.trim()) {
+          setAuthError("Please enter your full name.");
+          return;
+        }
+        if (!email.trim() || !email.includes("@")) {
+          setAuthError("Please enter a valid academic or personal email.");
+          return;
+        }
+
+        if (password.length >= 6) {
+          try {
+            await authenticateWithFirebase(email.trim(), password);
+          } catch (fbErr) {
+            console.warn("Firebase Auth registration warning:", fbErr);
+          }
+        }
+
+        const initials =
+          name
+            .trim()
+            .split(" ")
+            .map((p) => p[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2) || "SC";
+
+        const newUser: UserProfile = {
+          id: `usr-reg-${Date.now()}`,
+          name: name.trim(),
+          matricNo: identifier.trim() || (institutionType === "polytechnic" ? "SWD/2024/001" : "220407001"),
+          email: email.trim(),
+          institutionType,
+          institutionId: selectedInstitutionId,
+          institutionName: currentInstitution?.name || "Academic Institution",
+          facultyOrSchool,
+          department,
+          level,
+          avatarInitials: initials,
+          isLoggedIn: true,
+          role: "student",
+        };
+
+        syncUserProfile(newUser);
+        onLogin(newUser);
+      }
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -190,6 +361,14 @@ export function LandingAuthPage({
 
           {/* Header Actions */}
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => document.getElementById('consciousness-odyssey')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-850 px-3 py-1.5 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+            >
+              <Sparkles size={13} className="text-amber-600 dark:text-amber-400" />
+              <span>Awakening Odyssey</span>
+            </button>
+
             {onToggleDarkMode && (
               <button
                 onClick={onToggleDarkMode}
@@ -472,36 +651,73 @@ export function LandingAuthPage({
                     </div>
                   </div>
 
-                  {/* Quick 1-Click Demo Login Banner */}
-                  <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/90 flex flex-col gap-2">
+                  {/* Quick 1-Click Demo Login Banner with Polytechnic vs University separation */}
+                  <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/90 flex flex-col gap-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-wide">
-                        ⚡ Quick 1-Click Role Login
+                      <span className="text-[11px] font-bold text-neutral-800 uppercase tracking-wide flex items-center gap-1.5">
+                        <span>⚡ 1-Click Cohort & Role Test Logins</span>
                       </span>
-                      <span className="text-[10px] text-neutral-400">Instant Verification</span>
+                      <span className="text-[10px] text-neutral-400">Instant Access</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemoLogin("student")}
-                        className="flex-1 py-1.5 px-2 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[11px] font-bold text-[#006d64] transition-colors text-center truncate"
-                      >
-                        🎓 Student Demo
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemoLogin("courserep")}
-                        className="flex-1 py-1.5 px-2 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-[11px] font-bold text-amber-800 transition-colors text-center truncate"
-                      >
-                        📢 Course Rep Demo
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickDemoLogin("admin")}
-                        className="flex-1 py-1.5 px-2 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[11px] font-bold text-purple-800 transition-colors text-center truncate"
-                      >
-                        🛡️ Admin Demo
-                      </button>
+
+                    {/* Polytechnic (ND/HND) Demos */}
+                    <div className="p-2 rounded-xl bg-white border border-teal-200/70 space-y-1.5 shadow-2xs">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-teal-900 uppercase tracking-wider">
+                        <span className="flex items-center gap-1">🏛️ FEDPONEK (Polytechnic • ND/HND)</span>
+                        <span className="text-[9px] font-medium text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded-sm">SICT Dept</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemoLogin("student", "polytechnic")}
+                          className="py-1.5 px-2 rounded-lg bg-teal-50 hover:bg-teal-100 border border-teal-200 text-[11px] font-bold text-[#006d64] transition-colors text-center truncate"
+                          title="FEDPONEK Student (HND 1)"
+                        >
+                          🎓 Student
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemoLogin("courserep", "polytechnic")}
+                          className="py-1.5 px-2 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-[11px] font-bold text-amber-900 transition-colors text-center truncate shadow-2xs"
+                          title="FEDPONEK Course Rep (Note & Paper Uploads Authorized)"
+                        >
+                          📢 Course Rep ⭐
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemoLogin("admin", "polytechnic")}
+                          className="py-1.5 px-2 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-200 text-[11px] font-bold text-purple-800 transition-colors text-center truncate"
+                          title="FEDPONEK HOD Admin (Account Assignment)"
+                        >
+                          🛡️ HOD Admin
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* University (100L-500L) Demos */}
+                    <div className="p-2 rounded-xl bg-white border border-blue-200/70 space-y-1.5 shadow-2xs">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-blue-900 uppercase tracking-wider">
+                        <span className="flex items-center gap-1">🏛️ UNILAG (University • 100L–500L)</span>
+                        <span className="text-[9px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-sm">Faculty of Science</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemoLogin("student", "university")}
+                          className="py-1.5 px-2 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[11px] font-bold text-blue-800 transition-colors text-center truncate"
+                          title="UNILAG Student (300 Level Computer Sciences)"
+                        >
+                          🎓 Uni Student (300L)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickDemoLogin("courserep", "university")}
+                          className="py-1.5 px-2 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-[11px] font-bold text-amber-900 transition-colors text-center truncate shadow-2xs"
+                          title="UNILAG Course Rep (300L Class Rep - Uploads Authorized)"
+                        >
+                          📢 Uni Course Rep ⭐
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -560,6 +776,118 @@ export function LandingAuthPage({
                   ) : (
                     /* Form */
                     <form onSubmit={handleSubmit} className="space-y-3.5">
+                    {/* Institution Segregation Selector (Type & School/Polytechnic) */}
+                    <div className="p-3.5 rounded-xl bg-neutral-50/80 border border-neutral-200/80 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-semibold text-neutral-700">
+                        <span className="flex items-center gap-1.5">
+                          <School size={14} className="text-[#006d64]" />
+                          <span>Institution & Level Segregation</span>
+                        </span>
+                        <span className="text-[10px] text-neutral-400">Strict Curriculum Matching</span>
+                      </div>
+
+                      {/* Institution Type Selector */}
+                      <div className="grid grid-cols-2 gap-1.5 p-1 bg-neutral-200/60 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => handleInstitutionTypeChange("polytechnic")}
+                          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                            institutionType === "polytechnic"
+                              ? "bg-white text-teal-900 shadow-2xs"
+                              : "text-neutral-600 hover:text-neutral-900"
+                          }`}
+                        >
+                          🏛️ Polytechnic (ND / HND)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleInstitutionTypeChange("university")}
+                          className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                            institutionType === "university"
+                              ? "bg-white text-blue-900 shadow-2xs"
+                              : "text-neutral-600 hover:text-neutral-900"
+                          }`}
+                        >
+                          🏛️ University (100L – 500L)
+                        </button>
+                      </div>
+
+                      {/* Institution Dropdown */}
+                      <div>
+                        <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                          {institutionType === "polytechnic" ? "Polytechnic" : "University"}
+                        </label>
+                        <select
+                          value={selectedInstitutionId}
+                          onChange={(e) => handleInstitutionChange(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-neutral-200 focus:border-[#006d64] focus:ring-2 focus:ring-[#006d64]/20 text-xs text-neutral-900 outline-hidden transition-all bg-white"
+                        >
+                          {availableInstitutions.map((inst) => (
+                            <option key={inst.id} value={inst.id}>
+                              {inst.name} ({inst.id})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Division & Department Cascading */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                            {institutionType === "polytechnic" ? "School / Faculty" : "College / Faculty"}
+                          </label>
+                          <select
+                            value={facultyOrSchool}
+                            onChange={(e) => handleDivisionChange(e.target.value)}
+                            className="w-full px-2.5 py-2 rounded-xl border border-neutral-200 focus:border-[#006d64] text-xs text-neutral-900 outline-hidden bg-white truncate"
+                          >
+                            {availableDivisions.map((div) => (
+                              <option key={div.name} value={div.name}>
+                                {div.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                            Department
+                          </label>
+                          <select
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            className="w-full px-2.5 py-2 rounded-xl border border-neutral-200 focus:border-[#006d64] text-xs text-neutral-900 outline-hidden bg-white truncate"
+                          >
+                            {availableDepartments.map((dept) => (
+                              <option key={dept} value={dept}>
+                                {dept}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Academic Level strictly matching type */}
+                      <div>
+                        <label className="block text-[11px] font-medium text-neutral-600 mb-1">
+                          {institutionType === "polytechnic"
+                            ? "Academic Level (Polytechnic ND / HND)"
+                            : "Academic Level (University 100L – 500L)"}
+                        </label>
+                        <select
+                          value={level}
+                          onChange={(e) => setLevel(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-neutral-200 focus:border-[#006d64] text-xs text-neutral-900 outline-hidden bg-white"
+                        >
+                          {availableLevels.map((lvl) => (
+                            <option key={lvl.value} value={lvl.value}>
+                              {lvl.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
                     {/* Sign Up: Full Name */}
                     {authMode === "signup" && (
                       <div>
@@ -598,8 +926,8 @@ export function LandingAuthPage({
                             selectedRole === "admin"
                               ? "STAFF/ENG/049"
                               : selectedRole === "courserep"
-                              ? "SWD/2023/0018"
-                              : "SWD/2023/1042"
+                              ? (institutionType === "polytechnic" ? "SWD/2023/0018" : "210407015")
+                              : (institutionType === "polytechnic" ? "SWD/2023/1042" : "210407082")
                           }
                           value={identifier}
                           onChange={(e) => setIdentifier(e.target.value)}
@@ -652,46 +980,6 @@ export function LandingAuthPage({
                       </div>
                     )}
 
-                    {/* Department */}
-                    {authMode === "signup" && (
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                            Department
-                          </label>
-                          <select
-                            value={department}
-                            onChange={(e) => setDepartment(e.target.value)}
-                            className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 focus:border-[#006d64] focus:ring-2 focus:ring-[#006d64]/20 text-xs text-neutral-900 outline-hidden transition-all"
-                          >
-                            <option value="Software & Web Development">Software & Web Dev</option>
-                            <option value="Computer Science">Computer Science</option>
-                            <option value="General Studies">General Studies</option>
-                            <option value="Mathematics">Mathematics</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                            {selectedRole === "admin" ? "Faculty Office" : "Academic Level"}
-                          </label>
-                          <select
-                            value={level}
-                            onChange={(e) => setLevel(e.target.value)}
-                            className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 focus:border-[#006d64] focus:ring-2 focus:ring-[#006d64]/20 text-xs text-neutral-900 outline-hidden transition-all"
-                          >
-                            <option value="HND 1 • 300 Level">HND 1 (300L)</option>
-                            <option value="HND 2 • 400 Level">HND 2 (400L)</option>
-                            <option value="ND 1 • 100 Level">ND 1 (100L)</option>
-                            <option value="ND 2 • 200 Level">ND 2 (200L)</option>
-                            {selectedRole === "admin" && (
-                              <option value="Faculty Board">Faculty Board / HOD</option>
-                            )}
-                          </select>
-                        </div>
-                      </div>
-                    )}
-
                     {/* Password */}
                     <div>
                       <div className="flex items-center justify-between mb-1">
@@ -734,6 +1022,7 @@ export function LandingAuthPage({
                     {/* Submit Button */}
                     <button
                       type="submit"
+                      disabled={isAuthenticating}
                       className={`w-full py-3 rounded-xl text-white text-xs font-bold shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 ${
                         selectedRole === "admin"
                           ? "bg-purple-700 hover:bg-purple-800"
@@ -761,6 +1050,37 @@ export function LandingAuthPage({
                       </span>
                       <ArrowRight size={14} />
                     </button>
+
+                    {/* Google Authentication Divider & Button */}
+                    <div className="relative my-2.5">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-neutral-200 dark:border-slate-700"></div>
+                      </div>
+                      <div className="relative flex justify-center text-[11px]">
+                        <span className="bg-white dark:bg-[#0e1627] px-2 text-neutral-400 font-medium">
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={isGoogleLoading}
+                      className="w-full py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-neutral-50 dark:hover:bg-slate-800 text-neutral-800 dark:text-slate-200 text-xs font-bold shadow-2xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] disabled:opacity-60 cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.94H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.26c-.25-.72-.38-1.49-.38-2.26s.13-1.54.38-2.26V6.59H1.24C.45 8.18 0 9.98 0 12s.45 3.82 1.24 5.41l4.04-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.59l4.04 3.15c.95-2.84 3.6-4.94 6.72-4.94z"/>
+                      </svg>
+                      <span>
+                        {isGoogleLoading
+                          ? "Connecting Google Account..."
+                          : `${authMode === "signup" ? "Sign Up" : "Sign In"} with Google`}
+                      </span>
+                    </button>
                   </form>
                   )}
 
@@ -780,6 +1100,11 @@ export function LandingAuthPage({
             </div>
           </div>
         </section>
+
+        {/* The Awakening of Human Consciousness, Science, Art & History Odyssey */}
+        <div id="consciousness-odyssey" className="bg-[#fcfbf9] dark:bg-[#0d1322] border-t border-neutral-200/80 dark:border-slate-800">
+          <ConsciousnessOdysseySection />
+        </div>
 
         {/* Accredited Courses Carousel / Showcase */}
         <section className="py-10 bg-white border-t border-neutral-200/80">

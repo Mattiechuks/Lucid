@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   X,
   Clock,
@@ -8,17 +8,29 @@ import {
   ArrowRight,
   RotateCcw,
   Award,
+  Flame,
+  TrendingUp,
+  Sparkles,
 } from "lucide-react";
-import { CBTMode, CBTQuestion, Course } from "../types";
+import { CBTMode, CBTQuestion, Course, UserProfile, UserAnalytics, QuizResult } from "../types";
 import { CBT_QUESTION_BANK } from "../data/mockData";
+import { recordQuizCompletion } from "../lib/firebase";
 
 interface CBTQuizModalProps {
   course: Course;
   initialMode: CBTMode;
   onClose: () => void;
+  currentUser?: UserProfile;
+  onAnalyticsUpdated?: (analytics: UserAnalytics) => void;
 }
 
-export function CBTQuizModal({ course, initialMode, onClose }: CBTQuizModalProps) {
+export function CBTQuizModal({
+  course,
+  initialMode,
+  onClose,
+  currentUser,
+  onAnalyticsUpdated,
+}: CBTQuizModalProps) {
   const [mode, setMode] = useState<CBTMode>(initialMode);
   const questions: CBTQuestion[] = CBT_QUESTION_BANK[course.code] || CBT_QUESTION_BANK["AIT 311"] || [];
   
@@ -28,6 +40,8 @@ export function CBTQuizModal({ course, initialMode, onClose }: CBTQuizModalProps
   const [theoryAnswers, setTheoryAnswers] = useState<Record<number, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
+  const [userAnalytics, setUserAnalytics] = useState<UserAnalytics | null>(null);
+  const recordedRef = useRef(false);
 
   useEffect(() => {
     if (isSubmitted) return;
@@ -78,6 +92,37 @@ export function CBTQuizModal({ course, initialMode, onClose }: CBTQuizModalProps
     score = questions.length * 8; // out of 10
   }
 
+  // When submitted, record to persistent analytics
+  useEffect(() => {
+    if (!isSubmitted || recordedRef.current) return;
+    recordedRef.current = true;
+
+    const normalizedScore = Math.max(0, score);
+    const percentage = Math.round((normalizedScore / totalPossible) * 100);
+
+    const resultPayload: QuizResult = {
+      id: `qr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      userId: currentUser?.id || "guest",
+      userName: currentUser?.name || "Scholar Student",
+      courseCode: course.code,
+      courseTitle: course.title,
+      mode,
+      score: normalizedScore,
+      total: totalPossible,
+      percentage,
+      durationSeconds: Math.max(1, 300 - timeLeft),
+      completedAt: new Date().toISOString(),
+      institutionId: currentUser?.institutionId || "FEDPONEK",
+      department: currentUser?.department,
+      level: currentUser?.level,
+    };
+
+    recordQuizCompletion(resultPayload).then((analytics) => {
+      setUserAnalytics(analytics);
+      if (onAnalyticsUpdated) onAnalyticsUpdated(analytics);
+    });
+  }, [isSubmitted]);
+
   const handleReset = () => {
     setSelectedAnswers({});
     setGermanAnswers({});
@@ -85,6 +130,7 @@ export function CBTQuizModal({ course, initialMode, onClose }: CBTQuizModalProps
     setIsSubmitted(false);
     setCurrentIndex(0);
     setTimeLeft(300);
+    recordedRef.current = false;
   };
 
   return (
@@ -341,6 +387,26 @@ export function CBTQuizModal({ course, initialMode, onClose }: CBTQuizModalProps
                   <span className="text-[11px] text-neutral-500 font-semibold">Grade</span>
                 </div>
               </div>
+
+              {/* Study Streak & Persistent Record Banner */}
+              {userAnalytics && (
+                <div className="max-w-sm mx-auto p-3 rounded-xl bg-amber-50/90 border border-amber-200/80 flex items-center justify-between text-xs text-amber-900">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">
+                      <Flame size={16} />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold">{userAnalytics.currentStreakDays}-Day Study Streak Active!</p>
+                      <p className="text-[10px] text-amber-700">
+                        {userAnalytics.totalQuizzesTaken} CBT tests completed • Avg: {userAnalytics.averageScore}%
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-200/80 font-bold">
+                    Synced
+                  </span>
+                </div>
+              )}
 
               {/* Answers Review */}
               <div className="text-left space-y-3 max-h-64 overflow-y-auto">

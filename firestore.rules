@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profile access
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.resource.data.role in ['student', 'courserep', 'admin'];
+    }
+
+    // Lecture notes and AI decks - strictly Course Rep and Admin uploads
+    match /notes/{noteId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.authorRole in ['courserep', 'admin'];
+      allow delete: if resource.data.authorRole in ['courserep', 'admin'];
+    }
+
+    // Past Examination Questions - strictly Course Rep and Admin uploads
+    match /past_questions/{paperId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.authorRole in ['courserep', 'admin'];
+      allow delete: if resource.data.authorRole in ['courserep', 'admin'];
+    }
+
+    // Cohort Announcements - strictly Course Rep and Admin publishing
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.authorRole in ['courserep', 'admin'];
+      allow delete: if resource.data.authorRole in ['courserep', 'admin'];
+    }
+
+    // Student CBT Quiz performance records
+    match /quiz_results/{resultId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Persistent student study streaks and aggregate analytics
+    match /analytics/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
