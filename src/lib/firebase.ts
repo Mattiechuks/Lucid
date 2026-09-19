@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import {
   getFirestore,
+  setLogLevel,
   collection,
   doc,
   setDoc,
@@ -25,6 +26,25 @@ import {
   limit,
 } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
+
+// Configure Firestore log level to ERROR to suppress internal BloomFilter fallback warnings
+try {
+  setLogLevel("error");
+} catch {
+  // Ignore if already configured
+}
+
+// In browser runtime, prevent BloomFilter warning noise from surfacing in UI
+if (typeof window !== "undefined") {
+  const origWarn = console.warn.bind(console);
+  console.warn = (...args: unknown[]) => {
+    const str = String(args[0] ?? "");
+    if (str.includes("BloomFilter") || str.includes("BloomFilterError")) {
+      return;
+    }
+    origWarn(...args);
+  };
+}
 import {
   CourseNote,
   PastQuestionPaper,

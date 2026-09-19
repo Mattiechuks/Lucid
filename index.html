@@ -3,10 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lucid — AI Study Tools</title>
-    <meta name="description" content="Academic course hub with handwritten notes OCR transcription, CBT exam simulation (Objective, German with penalty, Theory), flashcards, and verified lab practical reports." />
-    <meta property="og:title" content="Lucid — AI Study Tools" />
-    <meta property="og:description" content="Academic course hub with handwritten notes OCR transcription, CBT exam simulation (Objective, German with penalty, Theory), flashcards, and verified lab practical reports." />
+    <script>
+      // Global error & unhandled rejection suppression for benign platform HMR and Firestore BloomFilter warnings
+      (function() {
+        function isBenign(str) {
+          if (!str) return false;
+          var s = String(str);
+          return (
+            s.indexOf('WebSocket closed without opened') !== -1 ||
+            s.indexOf('failed to connect to websocket') !== -1 ||
+            s.indexOf('BloomFilter') !== -1 ||
+            s.indexOf('BloomFilterError') !== -1
+          );
+        }
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var msg = (reason && (reason.message || reason.stack || String(reason))) || '';
+          if (isBenign(msg)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        window.addEventListener('error', function(event) {
+          var msg = (event && (event.message || (event.error && (event.error.message || String(event.error))))) || '';
+          if (isBenign(msg)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+
+        // Filter console errors and warnings for these benign messages
+        var origConsoleError = console.error;
+        console.error = function() {
+          for (var i = 0; i < arguments.length; i++) {
+            if (isBenign(arguments[i])) {
+              return;
+            }
+          }
+          origConsoleError.apply(console, arguments);
+        };
+
+        var origConsoleWarn = console.warn;
+        console.warn = function() {
+          for (var i = 0; i < arguments.length; i++) {
+            if (isBenign(arguments[i])) {
+              return;
+            }
+          }
+          origConsoleWarn.apply(console, arguments);
+        };
+      })();
+    </script>
+    <title>Lucid — The Academic Consciousness & Mastery Space</title>
+    <meta name="description" content="Sanctuary of Cognitive Illumination. Academic course hub with handwritten notes OCR transcription, CBT exam simulation (Objective, German with penalty, Theory), flashcards, and verified lab practical reports." />
+    <meta property="og:title" content="Lucid — The Academic Consciousness & Mastery Space" />
+    <meta property="og:description" content="Sanctuary of Cognitive Illumination. Academic course hub with handwritten notes OCR transcription, CBT exam simulation, flashcards, and verified lab practical reports." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#006d64" />
@@ -14,7 +67,7 @@
     <link rel="apple-touch-icon" href="/assets/icon-192.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       (function() {
         try {

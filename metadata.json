@@ -1,6 +1,6 @@
 {
   "name": "Lucid — AI Study Tools",
-  "description": "Academic course hub with handwritten notes OCR transcription, CBT exam simulation (Objective, German with penalty, Theory), flashcards, and verified lab practical reports.",
+  "description": "Sanctuary of Cognitive Illumination. Academic course hub with handwritten notes OCR transcription, CBT exam simulation, flashcards, and verified lab practical reports.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
