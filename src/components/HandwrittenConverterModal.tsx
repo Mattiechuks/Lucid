@@ -231,11 +231,11 @@ export function HandwrittenConverterModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-neutral-950/60 backdrop-blur-xs overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-neutral-950/70 backdrop-blur-xs overflow-y-auto animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl bg-white rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden my-6 animate-scale-in"
+        className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-2xl overflow-hidden my-6 animate-scale-in transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -270,13 +270,13 @@ export function HandwrittenConverterModal({
             {/* Top course and title settings */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                   Course
                 </label>
                 <select
                   value={course}
                   onChange={(e) => setCourse(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-medium text-neutral-800 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20"
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs font-medium text-neutral-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20"
                 >
                   {courses.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -287,7 +287,7 @@ export function HandwrittenConverterModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                   Lecture Title
                 </label>
                 <input
@@ -295,7 +295,7 @@ export function HandwrittenConverterModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Week 4: Cache Hierarchies"
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20"
+                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20 placeholder-neutral-400 dark:placeholder-slate-500"
                 />
               </div>
             </div>
@@ -305,15 +305,15 @@ export function HandwrittenConverterModal({
               <div className="space-y-4">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#006d64]/30 hover:border-[#006d64] bg-[#006d64]/5 hover:bg-[#006d64]/10 rounded-2xl p-8 text-center cursor-pointer transition-all"
+                  className="border-2 border-dashed border-[#006d64]/30 hover:border-[#006d64] bg-[#006d64]/5 dark:bg-[#006d64]/10 hover:bg-[#006d64]/10 rounded-2xl p-8 text-center cursor-pointer transition-all"
                 >
-                  <div className="w-12 h-12 rounded-full bg-[#006d64]/10 text-[#006d64] flex items-center justify-center mx-auto mb-3">
+                  <div className="w-12 h-12 rounded-full bg-[#006d64]/10 dark:bg-[#006d64]/20 text-[#006d64] dark:text-teal-400 flex items-center justify-center mx-auto mb-3">
                     <FileImage size={24} />
                   </div>
-                  <p className="text-sm font-bold text-neutral-900 mb-1">
+                  <p className="text-sm font-bold text-neutral-900 dark:text-white mb-1">
                     Upload Handwritten Notebook Page or Scanned PDF
                   </p>
-                  <p className="text-xs text-neutral-500 mb-4 max-w-md mx-auto">
+                  <p className="text-xs text-neutral-500 dark:text-slate-400 mb-4 max-w-md mx-auto">
                     Take a photo with your phone or select JPEG, PNG, or PDF of student notes, equations, diagrams, and bullet points.
                   </p>
                   
@@ -336,9 +336,9 @@ export function HandwrittenConverterModal({
                         e.stopPropagation();
                         cameraInputRef.current?.click();
                       }}
-                      className="px-4 py-2 rounded-xl bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold shadow-xs flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-neutral-800 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-slate-750 text-xs font-semibold shadow-xs flex items-center gap-1.5"
                     >
-                      <Camera size={14} className="text-[#006d64]" />
+                      <Camera size={14} className="text-[#006d64] dark:text-teal-400" />
                       <span>Snap with Camera</span>
                     </button>
                   </div>
@@ -361,12 +361,12 @@ export function HandwrittenConverterModal({
                 </div>
 
                 {/* Instant Try Demo Button */}
-                <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between gap-4">
+                <div className="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/80 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span className="text-xl">💡</span>
                     <div>
-                      <h4 className="text-xs font-bold text-amber-900">Don't have an image on hand?</h4>
-                      <p className="text-[11px] text-amber-700">
+                      <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200">Don't have an image on hand?</h4>
+                      <p className="text-[11px] text-amber-700 dark:text-amber-300">
                         Test the handwriting OCR engine immediately with our realistic student notebook sample.
                       </p>
                     </div>
@@ -383,32 +383,32 @@ export function HandwrittenConverterModal({
             ) : (
               /* Image loaded & ready to convert */
               <div className="space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-neutral-100">
+                <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <Check size={16} className="text-emerald-600" />
-                    <span className="text-xs font-bold text-neutral-800 truncate max-w-xs">{fileName}</span>
+                    <Check size={16} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-bold text-neutral-800 dark:text-slate-200 truncate max-w-xs">{fileName}</span>
                   </div>
                   
                   {/* Scanner Filter Controls */}
-                  <div className="flex items-center gap-1 bg-neutral-100 p-0.5 rounded-lg text-[11px] font-semibold">
+                  <div className="flex items-center gap-1 bg-neutral-100 dark:bg-slate-800 p-0.5 rounded-lg text-[11px] font-semibold">
                     <button
                       type="button"
                       onClick={() => setFilterMode("original")}
-                      className={`px-2 py-1 rounded ${filterMode === "original" ? "bg-white text-neutral-900 shadow-2xs" : "text-neutral-500"}`}
+                      className={`px-2 py-1 rounded ${filterMode === "original" ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs" : "text-neutral-500 dark:text-slate-400"}`}
                     >
                       Original
                     </button>
                     <button
                       type="button"
                       onClick={() => setFilterMode("high-contrast")}
-                      className={`px-2 py-1 rounded ${filterMode === "high-contrast" ? "bg-white text-neutral-900 shadow-2xs" : "text-neutral-500"}`}
+                      className={`px-2 py-1 rounded ${filterMode === "high-contrast" ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs" : "text-neutral-500 dark:text-slate-400"}`}
                     >
                       Scan Contrast
                     </button>
                     <button
                       type="button"
                       onClick={() => setFilterMode("inverted")}
-                      className={`px-2 py-1 rounded ${filterMode === "inverted" ? "bg-white text-neutral-900 shadow-2xs" : "text-neutral-500"}`}
+                      className={`px-2 py-1 rounded ${filterMode === "inverted" ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs" : "text-neutral-500 dark:text-slate-400"}`}
                     >
                       Dark Ink
                     </button>
@@ -416,7 +416,7 @@ export function HandwrittenConverterModal({
                 </div>
 
                 {/* Notebook page preview frame */}
-                <div className="relative max-h-72 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-900/5 flex items-center justify-center p-2">
+                <div className="relative max-h-72 rounded-xl overflow-hidden border border-neutral-200 dark:border-slate-700 bg-neutral-900/5 dark:bg-slate-950 flex items-center justify-center p-2">
                   <img
                     src={imagePreview}
                     alt="Handwritten note preview"
@@ -442,11 +442,11 @@ export function HandwrittenConverterModal({
 
                 {/* Conversion Trigger */}
                 {isProcessing ? (
-                  <div className="p-4 rounded-xl bg-teal-50 border border-teal-200 flex items-center gap-3">
-                    <RefreshCw size={18} className="text-[#006d64] animate-spin shrink-0" />
+                  <div className="p-4 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-850 flex items-center gap-3">
+                    <RefreshCw size={18} className="text-[#006d64] dark:text-teal-400 animate-spin shrink-0" />
                     <div>
-                      <p className="text-xs font-bold text-[#006d64]">Converting Student Handwriting...</p>
-                      <p className="text-[11px] text-teal-800">{progressStage}</p>
+                      <p className="text-xs font-bold text-[#006d64] dark:text-teal-300">Converting Student Handwriting...</p>
+                      <p className="text-[11px] text-teal-800 dark:text-teal-200/80">{progressStage}</p>
                     </div>
                   </div>
                 ) : (
@@ -466,14 +466,14 @@ export function HandwrittenConverterModal({
           /* Result view: Transcribed Note + Generated Cards + CBT questions */
           <div className="p-6 space-y-5">
             {/* Tabs for results */}
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
+            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setActiveResultTab("transcription")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                     activeResultTab === "transcription"
                       ? "bg-[#006d64] text-white shadow-2xs"
-                      : "text-neutral-600 hover:bg-neutral-100"
+                      : "text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800"
                   }`}
                 >
                   Transcribed Notes
@@ -483,7 +483,7 @@ export function HandwrittenConverterModal({
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 ${
                     activeResultTab === "cards"
                       ? "bg-[#006d64] text-white shadow-2xs"
-                      : "text-neutral-600 hover:bg-neutral-100"
+                      : "text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800"
                   }`}
                 >
                   <span>Active Recall Cards</span>
@@ -496,7 +496,7 @@ export function HandwrittenConverterModal({
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 ${
                     activeResultTab === "cbt"
                       ? "bg-[#006d64] text-white shadow-2xs"
-                      : "text-neutral-600 hover:bg-neutral-100"
+                      : "text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800"
                   }`}
                 >
                   <span>CBT Practice Quiz</span>
@@ -506,14 +506,14 @@ export function HandwrittenConverterModal({
                 </button>
               </div>
 
-              <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+              <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
                 <Check size={14} /> Converted Successfully
               </span>
             </div>
 
             {/* Tab content */}
             {activeResultTab === "transcription" && (
-              <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-xs text-neutral-800 max-h-72 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed">
+              <div className="p-4 rounded-xl bg-neutral-50 dark:bg-slate-950 border border-neutral-200 dark:border-slate-800 text-xs text-neutral-800 dark:text-slate-200 max-h-72 overflow-y-auto whitespace-pre-wrap font-mono leading-relaxed">
                 {result.transcription}
               </div>
             )}
@@ -521,11 +521,11 @@ export function HandwrittenConverterModal({
             {activeResultTab === "cards" && (
               <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
                 {result.cards.map((card, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-white border border-neutral-200/90 shadow-2xs">
-                    <p className="text-xs font-bold text-neutral-900 mb-1">
+                  <div key={idx} className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200/90 dark:border-slate-700 shadow-2xs">
+                    <p className="text-xs font-bold text-neutral-900 dark:text-white mb-1">
                       Q{idx + 1}: {card.q}
                     </p>
-                    <p className="text-xs text-neutral-600 pl-3 border-l-2 border-[#006d64]">
+                    <p className="text-xs text-neutral-600 dark:text-slate-300 pl-3 border-l-2 border-[#006d64] dark:border-teal-400">
                       {card.a}
                     </p>
                   </div>
@@ -536,8 +536,8 @@ export function HandwrittenConverterModal({
             {activeResultTab === "cbt" && (
               <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                 {result.cbtQuestions.map((q, idx) => (
-                  <div key={idx} className="p-3.5 rounded-xl bg-white border border-neutral-200">
-                    <p className="text-xs font-bold text-neutral-900 mb-2">
+                  <div key={idx} className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700">
+                    <p className="text-xs font-bold text-neutral-900 dark:text-white mb-2">
                       Q{idx + 1}: {q.question}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -546,8 +546,8 @@ export function HandwrittenConverterModal({
                           key={optIdx}
                           className={`p-2 rounded-lg text-xs border ${
                             optIdx === q.correctIndex
-                              ? "bg-emerald-50 border-emerald-300 text-emerald-900 font-semibold"
-                              : "bg-neutral-50 border-neutral-200 text-neutral-700"
+                              ? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200 font-semibold"
+                              : "bg-neutral-50 dark:bg-slate-750 border-neutral-200 dark:border-slate-700 text-neutral-700 dark:text-slate-300"
                           }`}
                         >
                           <span className="font-bold mr-1.5">{String.fromCharCode(65 + optIdx)}.</span>
@@ -561,11 +561,11 @@ export function HandwrittenConverterModal({
             )}
 
             {/* Bottom Actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
+            <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setResult(null)}
-                className="text-xs text-neutral-500 hover:text-neutral-800"
+                className="text-xs text-neutral-500 dark:text-slate-400 hover:text-neutral-800 dark:hover:text-slate-200"
               >
                 ← Convert Another Page
               </button>

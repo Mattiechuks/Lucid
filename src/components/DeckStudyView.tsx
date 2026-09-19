@@ -143,37 +143,37 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
       <main className="max-w-2xl mx-auto px-4 py-12">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors mb-8"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 dark:text-slate-400 hover:text-neutral-900 dark:hover:text-white transition-colors mb-8"
         >
           <ArrowLeft size={14} />
           <span>Back to all notes</span>
         </button>
 
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 sm:p-10 shadow-xs text-center">
-          <div className="w-14 h-14 mx-auto rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mb-5">
+        <div className="bg-white dark:bg-slate-900 border border-neutral-200/90 dark:border-slate-800 rounded-2xl p-8 sm:p-10 shadow-xs text-center transition-colors">
+          <div className="w-14 h-14 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center mb-5">
             <CheckCircle2 size={30} />
           </div>
 
-          <h1 className="font-serif-display text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
+          <h1 className="font-serif-display text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white mb-2">
             Deck Completed
           </h1>
-          <p className="text-sm text-neutral-500 max-w-md mx-auto mb-8">
-            You reviewed {total} cards for <span className="font-semibold text-neutral-800">{note.course}</span> — {note.title}.
+          <p className="text-sm text-neutral-500 dark:text-slate-400 max-w-md mx-auto mb-8">
+            You reviewed {total} cards for <span className="font-semibold text-neutral-800 dark:text-slate-200">{note.course}</span> — {note.title}.
           </p>
 
           {/* Stats Breakdown */}
           <div className="grid grid-cols-3 gap-3 max-w-md mx-auto mb-8">
-            <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
-              <span className="block text-2xl font-bold text-neutral-900">{masteryPercentage}%</span>
-              <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">Mastery</span>
+            <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-slate-800 border border-neutral-200/80 dark:border-slate-700">
+              <span className="block text-2xl font-bold text-neutral-900 dark:text-white">{masteryPercentage}%</span>
+              <span className="text-[11px] font-medium text-neutral-500 dark:text-slate-400 uppercase tracking-wider">Mastery</span>
             </div>
-            <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/60">
-              <span className="block text-2xl font-bold text-emerald-700">{gotItCount}</span>
-              <span className="text-[11px] font-medium text-emerald-600 uppercase tracking-wider">Got It</span>
+            <div className="p-3.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800">
+              <span className="block text-2xl font-bold text-emerald-700 dark:text-emerald-400">{gotItCount}</span>
+              <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-300 uppercase tracking-wider">Got It</span>
             </div>
-            <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60">
-              <span className="block text-2xl font-bold text-amber-700">{reviewCount}</span>
-              <span className="text-[11px] font-medium text-amber-600 uppercase tracking-wider">Needs Review</span>
+            <div className="p-3.5 rounded-xl bg-amber-50/50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800">
+              <span className="block text-2xl font-bold text-amber-700 dark:text-amber-400">{reviewCount}</span>
+              <span className="text-[11px] font-medium text-amber-600 dark:text-amber-300 uppercase tracking-wider">Needs Review</span>
             </div>
           </div>
 
@@ -182,7 +182,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
             {reviewCount > 0 && (
               <button
                 onClick={() => handleRestart(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-xs transition-all"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-900 dark:bg-teal-700 hover:bg-neutral-800 dark:hover:bg-teal-600 text-white text-xs font-semibold shadow-xs transition-all"
               >
                 <RotateCcw size={14} />
                 <span>Review Missed Cards ({reviewCount})</span>
@@ -191,7 +191,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
 
             <button
               onClick={() => handleRestart(false)}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold border border-neutral-200 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-slate-800 hover:bg-neutral-200 dark:hover:bg-slate-700 text-neutral-800 dark:text-slate-200 text-xs font-semibold border border-neutral-200 dark:border-slate-700 transition-colors"
             >
               <RotateCcw size={14} />
               <span>Study All Cards Again</span>
@@ -199,7 +199,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
 
             <button
               onClick={exportDeckAsMarkdown}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-neutral-50 text-neutral-700 text-xs font-semibold border border-neutral-200 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-neutral-50 dark:hover:bg-slate-700 text-neutral-700 dark:text-slate-300 text-xs font-semibold border border-neutral-200 dark:border-slate-700 transition-colors"
             >
               <Download size={14} />
               <span>Export Markdown</span>
@@ -207,7 +207,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
           </div>
 
           {copiedToast && (
-            <p className="mt-4 text-xs text-emerald-600 font-medium animate-fade-in">
+            <p className="mt-4 text-xs text-emerald-600 dark:text-emerald-400 font-medium animate-fade-in">
               Deck downloaded successfully!
             </p>
           )}
@@ -219,8 +219,8 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
   if (!currentCard) {
     return (
       <div className="max-w-xl mx-auto py-16 text-center">
-        <p className="text-neutral-500 mb-4">No cards found in this deck.</p>
-        <button onClick={onBack} className="text-xs font-semibold text-blue-600 underline">
+        <p className="text-neutral-500 dark:text-slate-400 mb-4">No cards found in this deck.</p>
+        <button onClick={onBack} className="text-xs font-semibold text-blue-600 dark:text-blue-400 underline">
           Return to notes
         </button>
       </div>
@@ -236,7 +236,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
       <div className="flex items-center justify-between gap-4 mb-6">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-600 hover:text-neutral-950 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-600 dark:text-slate-400 hover:text-neutral-950 dark:hover:text-white transition-colors group"
         >
           <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
           <span>Back to notes</span>
@@ -248,8 +248,8 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
             title={isStarred ? "Card Starred" : "Star this card for later"}
             className={`p-2 rounded-lg border transition-colors ${
               isStarred
-                ? "bg-amber-50 border-amber-300 text-amber-500"
-                : "bg-white border-neutral-200 text-neutral-400 hover:text-neutral-700"
+                ? "bg-amber-50 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700 text-amber-500"
+                : "bg-white dark:bg-slate-800 border-neutral-200 dark:border-slate-700 text-neutral-400 dark:text-slate-400 hover:text-neutral-700 dark:hover:text-white"
             }`}
           >
             <Star size={15} className={isStarred ? "fill-amber-400" : ""} />
@@ -258,7 +258,7 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
           <button
             onClick={handleShuffle}
             title="Shuffle Deck"
-            className="p-2 rounded-lg bg-white border border-neutral-200 text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-neutral-500 dark:text-slate-300 hover:text-neutral-900 dark:hover:text-white transition-colors"
           >
             <Shuffle size={15} />
           </button>
@@ -268,29 +268,29 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
       {/* Course & Note Title */}
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="inline-block text-[11px] font-bold tracking-wide text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/50">
+          <span className="inline-block text-[11px] font-bold tracking-wide text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-800">
             {note.course}
           </span>
           {studyModeFilter === "missed" && (
-            <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
               Focusing on Missed Cards
             </span>
           )}
         </div>
-        <h2 className="text-base sm:text-lg font-bold text-neutral-900">
+        <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
           {note.title}
         </h2>
       </div>
 
       {/* Progress Bar & Counter */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex-1 h-2 bg-neutral-200/70 rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-neutral-200/70 dark:bg-slate-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-neutral-900 rounded-full transition-all duration-300 ease-out"
+            className="h-full bg-neutral-900 dark:bg-teal-500 rounded-full transition-all duration-300 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        <span className="text-xs font-semibold text-neutral-500 tabular-nums">
+        <span className="text-xs font-semibold text-neutral-500 dark:text-slate-400 tabular-nums">
           {index + 1} / {activeDeck.length}
         </span>
       </div>
@@ -304,49 +304,49 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
           onKeyDown={(e) => e.key === "Enter" && setIsFlipped((f) => !f)}
           className={`relative w-full min-h-[300px] sm:min-h-[340px] rounded-2xl border transition-all duration-500 transform-style-3d cursor-pointer select-none shadow-xs hover:shadow-md ${
             isFlipped
-              ? "rotate-y-180 border-blue-200 bg-white"
-              : "border-neutral-200/90 bg-white hover:border-neutral-300"
+              ? "rotate-y-180 border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900"
+              : "border-neutral-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-neutral-300 dark:hover:border-slate-700"
           }`}
         >
           {/* Front Face: Question */}
           <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-between backface-hidden">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-neutral-400 uppercase tracking-widest text-[10px]">
+              <span className="font-semibold text-neutral-400 dark:text-slate-500 uppercase tracking-widest text-[10px]">
                 Question {index + 1}
               </span>
-              <span className="text-neutral-400 text-[11px]">Click or press Space</span>
+              <span className="text-neutral-400 dark:text-slate-500 text-[11px]">Click or press Space</span>
             </div>
 
             <div className="my-auto py-4">
-              <p className="font-serif-display text-xl sm:text-2xl text-neutral-900 leading-relaxed font-semibold">
+              <p className="font-serif-display text-xl sm:text-2xl text-neutral-900 dark:text-white leading-relaxed font-semibold">
                 {currentCard.q}
               </p>
             </div>
 
-            <div className="text-center pt-2 border-t border-neutral-100">
-              <span className="text-xs font-medium text-blue-600 hover:text-blue-700">
+            <div className="text-center pt-2 border-t border-neutral-100 dark:border-slate-800">
+              <span className="text-xs font-medium text-blue-600 dark:text-teal-400 hover:text-blue-700">
                 Click to reveal answer →
               </span>
             </div>
           </div>
 
           {/* Back Face: Answer */}
-          <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-between rotate-y-180 backface-hidden bg-neutral-50/50">
+          <div className="absolute inset-0 p-8 sm:p-10 flex flex-col justify-between rotate-y-180 backface-hidden bg-neutral-50/50 dark:bg-slate-900">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-blue-600 uppercase tracking-widest text-[10px]">
+              <span className="font-semibold text-blue-600 dark:text-teal-400 uppercase tracking-widest text-[10px]">
                 Answer
               </span>
-              <span className="text-neutral-400 text-[11px]">Card {index + 1} of {activeDeck.length}</span>
+              <span className="text-neutral-400 dark:text-slate-500 text-[11px]">Card {index + 1} of {activeDeck.length}</span>
             </div>
 
             <div className="my-auto py-4">
-              <p className="text-neutral-800 text-base sm:text-lg leading-relaxed font-normal">
+              <p className="text-neutral-800 dark:text-slate-200 text-base sm:text-lg leading-relaxed font-normal">
                 {currentCard.a}
               </p>
             </div>
 
-            <div className="text-center pt-2 border-t border-neutral-200/60">
-              <span className="text-xs font-medium text-neutral-500">
+            <div className="text-center pt-2 border-t border-neutral-200/60 dark:border-slate-800">
+              <span className="text-xs font-medium text-neutral-500 dark:text-slate-400">
                 Rate your recall below to advance
               </span>
             </div>
@@ -360,38 +360,38 @@ export function DeckStudyView({ note, onBack }: DeckStudyViewProps) {
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
               onClick={() => handleRate("review")}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-200 font-semibold text-xs transition-all active:scale-[0.98]"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white dark:bg-slate-800 hover:bg-neutral-100 dark:hover:bg-slate-700 text-neutral-800 dark:text-slate-200 border border-neutral-200 dark:border-slate-700 font-semibold text-xs transition-all active:scale-[0.98]"
             >
-              <ThumbsDown size={14} className="text-amber-500" />
+              <ThumbsDown size={14} className="text-amber-500 dark:text-amber-400" />
               <span>Review Again</span>
-              <span className="hidden sm:inline text-[10px] text-neutral-400 font-mono">(1 or ←)</span>
+              <span className="hidden sm:inline text-[10px] text-neutral-400 dark:text-slate-500 font-mono">(1 or ←)</span>
             </button>
 
             <button
               onClick={() => handleRate("got-it")}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-semibold text-xs shadow-xs transition-all active:scale-[0.98]"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-neutral-900 dark:bg-teal-700 hover:bg-neutral-800 dark:hover:bg-teal-600 text-white font-semibold text-xs shadow-xs transition-all active:scale-[0.98]"
             >
               <ThumbsUp size={14} className="text-emerald-400" />
               <span>Got It</span>
-              <span className="hidden sm:inline text-[10px] text-neutral-400 font-mono">(2 or →)</span>
+              <span className="hidden sm:inline text-[10px] text-neutral-400 dark:text-slate-400 font-mono">(2 or →)</span>
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-4 text-neutral-400 text-xs font-medium">
+          <div className="flex items-center gap-4 text-neutral-400 dark:text-slate-500 text-xs font-medium">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 font-mono text-[10px] text-neutral-600">
+              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 font-mono text-[10px] text-neutral-600 dark:text-slate-300">
                 Space
               </kbd>{" "}
               flip card
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 font-mono text-[10px] text-neutral-600">
+              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 font-mono text-[10px] text-neutral-600 dark:text-slate-300">
                 S
               </kbd>{" "}
               star
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 font-mono text-[10px] text-neutral-600">
+              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 font-mono text-[10px] text-neutral-600 dark:text-slate-300">
                 Esc
               </kbd>{" "}
               exit

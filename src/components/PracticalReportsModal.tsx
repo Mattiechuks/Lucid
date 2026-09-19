@@ -54,7 +54,7 @@ ${selectedReport.conclusions}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-4xl bg-white rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scale-in"
+        className="w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-scale-in transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -87,8 +87,8 @@ ${selectedReport.conclusions}
         {/* Content Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 flex-1 overflow-hidden">
           {/* Left list of reports */}
-          <div className="border-r border-neutral-200 p-4 bg-neutral-50/70 overflow-y-auto space-y-2">
-            <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2">
+          <div className="border-r border-neutral-200 dark:border-slate-800 p-4 bg-neutral-50/70 dark:bg-slate-950/70 overflow-y-auto space-y-2">
+            <h3 className="text-xs font-bold text-neutral-500 dark:text-slate-400 uppercase tracking-wider mb-2">
               Available Lab Reports
             </h3>
             {PRACTICAL_REPORTS.map((rep) => (
@@ -97,15 +97,15 @@ ${selectedReport.conclusions}
                 onClick={() => setSelectedReport(rep)}
                 className={`w-full text-left p-3 rounded-xl border text-xs transition-all ${
                   activeReport.id === rep.id
-                    ? "bg-white border-[#006d64] shadow-2xs font-semibold text-neutral-900"
-                    : "bg-white/50 border-neutral-200 text-neutral-600 hover:bg-white"
+                    ? "bg-white dark:bg-slate-800 border-[#006d64] dark:border-teal-500 shadow-2xs font-semibold text-neutral-900 dark:text-slate-100"
+                    : "bg-white/50 dark:bg-slate-900/50 border-neutral-200 dark:border-slate-800 text-neutral-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-[#006d64]">{rep.course}</span>
-                  <span className="text-[10px] text-neutral-400">Week {rep.weekNumber}</span>
+                  <span className="font-bold text-[#006d64] dark:text-teal-400">{rep.course}</span>
+                  <span className="text-[10px] text-neutral-400 dark:text-slate-400">Week {rep.weekNumber}</span>
                 </div>
-                <p className="line-clamp-2 text-neutral-800 text-[11px] leading-snug">
+                <p className="line-clamp-2 text-neutral-800 dark:text-slate-200 text-[11px] leading-snug">
                   {rep.title}
                 </p>
               </button>
@@ -113,21 +113,21 @@ ${selectedReport.conclusions}
           </div>
 
           {/* Right report view */}
-          <div className="col-span-2 p-6 overflow-y-auto space-y-5">
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-neutral-200">
+          <div className="col-span-2 p-6 overflow-y-auto space-y-5 bg-white dark:bg-slate-900 transition-colors">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-slate-800">
               <div>
-                <span className="text-xs font-bold text-[#006d64] uppercase tracking-wider block">
+                <span className="text-xs font-bold text-[#006d64] dark:text-teal-400 uppercase tracking-wider block">
                   {activeReport.course} • Practical Manual
                 </span>
-                <h3 className="text-base font-bold text-neutral-900 mt-0.5">
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white mt-0.5">
                   {activeReport.title}
                 </h3>
-                <span className="text-[11px] text-neutral-400">Recorded on {activeReport.date}</span>
+                <span className="text-[11px] text-neutral-400 dark:text-slate-400">Recorded on {activeReport.date}</span>
               </div>
 
               <button
                 onClick={handleDownload}
-                className="px-3.5 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 whitespace-nowrap"
+                className="px-3.5 py-1.5 rounded-xl bg-neutral-900 dark:bg-teal-600 hover:bg-neutral-800 dark:hover:bg-teal-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 whitespace-nowrap transition-colors"
               >
                 <Download size={13} />
                 <span>Download Report</span>
@@ -137,19 +137,19 @@ ${selectedReport.conclusions}
             {/* Sections */}
             <div className="space-y-4 text-xs">
               <div>
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider mb-1 text-[11px]">
+                <h4 className="font-bold text-neutral-800 dark:text-slate-200 uppercase tracking-wider mb-1 text-[11px]">
                   1. Aim of the Experiment
                 </h4>
-                <p className="text-neutral-700 bg-neutral-50 p-3 rounded-xl border border-neutral-200 leading-relaxed">
+                <p className="text-neutral-700 dark:text-slate-300 bg-neutral-50 dark:bg-slate-800/80 p-3 rounded-xl border border-neutral-200 dark:border-slate-700 leading-relaxed">
                   {activeReport.aim}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider mb-1 text-[11px]">
+                <h4 className="font-bold text-neutral-800 dark:text-slate-200 uppercase tracking-wider mb-1 text-[11px]">
                   2. Apparatus & Tools Required
                 </h4>
-                <ul className="list-disc list-inside space-y-1 text-neutral-700 pl-1">
+                <ul className="list-disc list-inside space-y-1 text-neutral-700 dark:text-slate-300 pl-1">
                   {activeReport.apparatus.map((item, i) => (
                     <li key={i}>{item}</li>
                   ))}
@@ -157,10 +157,10 @@ ${selectedReport.conclusions}
               </div>
 
               <div>
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider mb-1 text-[11px]">
+                <h4 className="font-bold text-neutral-800 dark:text-slate-200 uppercase tracking-wider mb-1 text-[11px]">
                   3. Experimental Procedure
                 </h4>
-                <ol className="list-decimal list-inside space-y-1.5 text-neutral-700 pl-1">
+                <ol className="list-decimal list-inside space-y-1.5 text-neutral-700 dark:text-slate-300 pl-1">
                   {activeReport.procedure.map((step, i) => (
                     <li key={i} className="leading-relaxed">{step}</li>
                   ))}
@@ -168,19 +168,19 @@ ${selectedReport.conclusions}
               </div>
 
               <div>
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider mb-1 text-[11px]">
+                <h4 className="font-bold text-neutral-800 dark:text-slate-200 uppercase tracking-wider mb-1 text-[11px]">
                   4. Observations & Experimental Findings
                 </h4>
-                <p className="text-neutral-700 bg-neutral-50 p-3 rounded-xl border border-neutral-200 leading-relaxed">
+                <p className="text-neutral-700 dark:text-slate-300 bg-neutral-50 dark:bg-slate-800/80 p-3 rounded-xl border border-neutral-200 dark:border-slate-700 leading-relaxed">
                   {activeReport.observations}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-neutral-800 uppercase tracking-wider mb-1 text-[11px]">
+                <h4 className="font-bold text-neutral-800 dark:text-slate-200 uppercase tracking-wider mb-1 text-[11px]">
                   5. Conclusion
                 </h4>
-                <p className="text-emerald-900 bg-emerald-50/60 p-3 rounded-xl border border-emerald-200 leading-relaxed font-medium">
+                <p className="text-emerald-900 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 leading-relaxed font-medium">
                   {activeReport.conclusions}
                 </p>
               </div>

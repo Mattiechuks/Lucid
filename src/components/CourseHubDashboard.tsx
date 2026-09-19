@@ -163,35 +163,35 @@ export function CourseHubDashboard({
         {/* Left Sidebar: 4 cols */}
         <aside className="lg:col-span-4 space-y-4">
           {/* Institutional Cohort Segregation Card */}
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/90 shadow-2xs space-y-2">
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-neutral-200/90 dark:border-slate-800 shadow-2xs space-y-2 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-center text-sm shrink-0">
+                <span className="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 flex items-center justify-center text-sm shrink-0">
                   🏛️
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-neutral-900 truncate">
+                  <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">
                     {currentUser?.institutionName || (currentUser?.institutionType === "polytechnic" ? "Federal Polytechnic Nekede" : "University of Lagos")}
                   </p>
-                  <p className="text-[10px] text-neutral-500 uppercase tracking-wider font-semibold">
+                  <p className="text-[10px] text-neutral-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                     {currentUser?.institutionType === "polytechnic" ? "Polytechnic Structure" : "University Structure"}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowCohortModal(true)}
-                className="text-[11px] font-bold text-[#006d64] hover:text-[#005851] hover:underline shrink-0 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200/80 flex items-center gap-1 transition-all"
+                className="text-[11px] font-bold text-[#006d64] dark:text-teal-300 hover:text-[#005851] hover:underline shrink-0 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 flex items-center gap-1 transition-all"
                 title="Explore and switch between Polytechnic and University departments and levels"
               >
                 <RefreshCw size={11} />
                 <span>Switch</span>
               </button>
             </div>
-            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px]">
-              <span className="text-neutral-600 truncate max-w-[180px]" title={currentUser?.department}>
+            <div className="pt-2 border-t border-neutral-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+              <span className="text-neutral-600 dark:text-slate-300 truncate max-w-[180px]" title={currentUser?.department}>
                 {currentUser?.department || "Software & Web Development"}
               </span>
-              <span className="px-2 py-0.5 rounded-md font-bold bg-[#006d64]/10 text-[#006d64] shrink-0 text-[10px]">
+              <span className="px-2 py-0.5 rounded-md font-bold bg-[#006d64]/10 dark:bg-teal-950/80 text-[#006d64] dark:text-teal-300 shrink-0 text-[10px]">
                 {currentUser?.level || activeCourse.level || "HND 1"}
               </span>
             </div>
@@ -199,18 +199,18 @@ export function CourseHubDashboard({
 
           {/* Search courses input */}
           <div className="relative">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-slate-400" />
             <input
               type="text"
               placeholder="Search courses..."
               value={courseSearch}
               onChange={(e) => setCourseSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-neutral-200 text-xs text-neutral-800 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64] shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 text-xs text-neutral-800 dark:text-slate-100 placeholder:text-neutral-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64] shadow-2xs transition-colors"
             />
           </div>
 
           {/* Courses List */}
-          <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs overflow-hidden p-2 space-y-1">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs overflow-hidden p-2 space-y-1 transition-colors">
             {filteredCourses.map((c) => {
               const isSelected = c.code === activeCourse.code;
               const color = COURSE_COLORS[c.code] || {
@@ -226,20 +226,20 @@ export function CourseHubDashboard({
                   onClick={() => onSelectCourse(c)}
                   className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between group ${
                     isSelected
-                      ? "bg-[#006d64]/8 border border-[#006d64]/25 shadow-2xs"
-                      : "hover:bg-neutral-50 border border-transparent"
+                      ? "bg-[#006d64]/8 dark:bg-teal-950/40 border border-[#006d64]/25 dark:border-teal-500/40 shadow-2xs"
+                      : "hover:bg-neutral-50 dark:hover:bg-slate-800/80 border border-transparent"
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Course Code Badge */}
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold font-mono shrink-0 border ${color.bg} ${color.text} ${color.border}`}
+                      className={`px-2 py-0.5 rounded-md text-[11px] font-bold font-mono shrink-0 border ${color.bg} ${color.text} ${color.border} dark:opacity-90`}
                     >
                       {c.code}
                     </span>
                     <span
                       className={`text-xs font-semibold truncate ${
-                        isSelected ? "text-[#006d64] font-bold" : "text-neutral-700"
+                        isSelected ? "text-[#006d64] dark:text-teal-400 font-bold" : "text-neutral-700 dark:text-slate-200"
                       }`}
                     >
                       {c.title}
@@ -247,11 +247,11 @@ export function CourseHubDashboard({
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0 ml-2">
-                    <span className="text-[10px] text-neutral-400 font-medium">{c.units || 3}U</span>
+                    <span className="text-[10px] text-neutral-400 dark:text-slate-400 font-medium">{c.units || 3}U</span>
                     <ChevronRight
                       size={14}
-                      className={`text-neutral-400 transition-transform ${
-                        isSelected ? "text-[#006d64] translate-x-0.5" : "group-hover:translate-x-0.5"
+                      className={`text-neutral-400 dark:text-slate-400 transition-transform ${
+                        isSelected ? "text-[#006d64] dark:text-teal-400 translate-x-0.5" : "group-hover:translate-x-0.5"
                       }`}
                     />
                   </div>
@@ -261,14 +261,14 @@ export function CourseHubDashboard({
           </div>
 
           {/* Semester Summary Card matching screenshot */}
-          <div className="p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-xs space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-neutral-200/90 dark:border-slate-800 shadow-xs space-y-2 transition-colors">
+            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-400 dark:text-slate-400">
               <span>{activeCourse.semester || "First Semester"}</span>
-              <span className="text-[#006d64] font-bold">{currentUser?.level || activeCourse.level || "HND 1"}</span>
+              <span className="text-[#006d64] dark:text-teal-400 font-bold">{currentUser?.level || activeCourse.level || "HND 1"}</span>
             </div>
-            <div className="flex items-center justify-between pt-1 border-t border-neutral-100">
-              <span className="text-xs text-neutral-600 font-medium">{courses.length} Courses Registered</span>
-              <span className="text-xs font-bold text-neutral-900">{totalRegisteredUnits} Total Credit Units</span>
+            <div className="flex items-center justify-between pt-1 border-t border-neutral-100 dark:border-slate-800">
+              <span className="text-xs text-neutral-600 dark:text-slate-400 font-medium">{courses.length} Courses Registered</span>
+              <span className="text-xs font-bold text-neutral-900 dark:text-slate-100">{totalRegisteredUnits} Total Credit Units</span>
             </div>
           </div>
         </aside>
@@ -278,12 +278,12 @@ export function CourseHubDashboard({
           {/* Role-Differentiated Workspace Top Banner */}
           {currentUser && (
             <div
-              className={`p-4 rounded-2xl border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+              className={`p-4 rounded-2xl border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
                 currentUser.role === "admin"
-                  ? "bg-purple-50/80 border-purple-200/80 text-purple-950"
+                  ? "bg-purple-50/80 dark:bg-purple-950/40 border-purple-200/80 dark:border-purple-800 text-purple-950 dark:text-purple-200"
                   : currentUser.role === "courserep"
-                  ? "bg-amber-50/80 border-amber-200/80 text-amber-950"
-                  : "bg-teal-50/80 border-teal-200/80 text-teal-950"
+                  ? "bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/80 dark:border-amber-800 text-amber-950 dark:text-amber-200"
+                  : "bg-teal-50/80 dark:bg-teal-950/40 border-teal-200/80 dark:border-teal-800 text-teal-950 dark:text-teal-200"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -316,24 +316,24 @@ export function CourseHubDashboard({
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
                         currentUser.role === "admin"
-                          ? "bg-purple-200/70 text-purple-900"
+                          ? "bg-purple-200/70 dark:bg-purple-900/60 text-purple-900 dark:text-purple-300"
                           : currentUser.role === "courserep"
-                          ? "bg-amber-200/70 text-amber-900"
-                          : "bg-teal-200/70 text-teal-900"
+                          ? "bg-amber-200/70 dark:bg-amber-900/60 text-amber-900 dark:text-amber-300"
+                          : "bg-teal-200/70 dark:bg-teal-900/60 text-teal-900 dark:text-teal-300"
                       }`}
                     >
                       {currentUser.role === "courserep" ? "Course Rep" : currentUser.role}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-neutral-600 mt-0.5 flex-wrap">
-                    <span className="font-semibold text-neutral-900">{currentUser.name}</span>
-                    <span className="text-neutral-300">•</span>
-                    <span className="font-medium text-[#006d64]">
+                  <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-slate-300 mt-0.5 flex-wrap">
+                    <span className="font-semibold text-neutral-900 dark:text-white">{currentUser.name}</span>
+                    <span className="text-neutral-300 dark:text-slate-600">•</span>
+                    <span className="font-medium text-[#006d64] dark:text-teal-400">
                       {currentUser.institutionName || (currentUser.institutionType === "polytechnic" ? "Federal Polytechnic Nekede" : "University of Lagos")}
                     </span>
-                    <span className="text-neutral-300">•</span>
+                    <span className="text-neutral-300 dark:text-slate-600">•</span>
                     <span className="truncate">{currentUser.department}</span>
-                    <span className="px-1.5 py-0.2 rounded bg-neutral-200/70 text-neutral-800 font-bold text-[10px]">
+                    <span className="px-1.5 py-0.2 rounded bg-neutral-200/70 dark:bg-slate-800 text-neutral-800 dark:text-slate-200 font-bold text-[10px]">
                       {currentUser.level || "HND 1"}
                     </span>
                   </div>
@@ -345,10 +345,10 @@ export function CourseHubDashboard({
                 {currentUser.role === "admin" && onOpenUserProvisioning && (
                   <button
                     onClick={onOpenUserProvisioning}
-                    className="px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 border border-purple-300 text-purple-950 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 hover:bg-purple-200 dark:hover:bg-purple-900/60 border border-purple-300 dark:border-purple-800 text-purple-950 dark:text-purple-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
                     title="Assign & Register Department Admins and Course Reps"
                   >
-                    <UserPlus size={13} className="text-purple-700" />
+                    <UserPlus size={13} className="text-purple-700 dark:text-purple-400" />
                     <span>Assign Accounts</span>
                   </button>
                 )}
@@ -368,7 +368,7 @@ export function CourseHubDashboard({
                 {currentUser.role === "courserep" && (
                   <button
                     onClick={onUploadNoteClick}
-                    className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
                     title="Authorized to upload official course syllabus notes"
                   >
                     <Upload size={13} />
@@ -378,10 +378,10 @@ export function CourseHubDashboard({
                 {currentUser.role === "student" && (
                   <button
                     onClick={onUploadNoteClick}
-                    className="px-3 py-1.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 text-neutral-600 text-xs font-medium shadow-2xs transition-all flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-xl bg-neutral-100 dark:bg-slate-800 hover:bg-neutral-200 dark:hover:bg-slate-700 border border-neutral-300 dark:border-slate-700 text-neutral-600 dark:text-slate-300 text-xs font-medium shadow-2xs transition-all flex items-center gap-1.5"
                     title="Uploads restricted to verified Class Representatives"
                   >
-                    <Lock size={12} className="text-neutral-500" />
+                    <Lock size={12} className="text-neutral-500 dark:text-slate-400" />
                     <span>Rep Upload Only</span>
                   </button>
                 )}
@@ -391,20 +391,20 @@ export function CourseHubDashboard({
 
           {/* Department & Cohort Announcements Card */}
           {announcements.length > 0 && (
-            <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-4 space-y-3">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-4 space-y-3 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-teal-50 text-[#006d64] flex items-center justify-center font-bold text-xs">
+                  <div className="w-6 h-6 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-[#006d64] dark:text-teal-400 flex items-center justify-center font-bold text-xs">
                     <Pin size={13} />
                   </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wide">
+                  <h3 className="text-xs font-bold text-neutral-900 dark:text-white uppercase tracking-wide">
                     Official Department & Cohort Notices
                   </h3>
                 </div>
                 {canPostNotice && (
                   <button
                     onClick={() => setShowAnnouncementModal(true)}
-                    className="text-[11px] font-bold text-[#006d64] hover:underline flex items-center gap-1"
+                    className="text-[11px] font-bold text-[#006d64] dark:text-teal-400 hover:underline flex items-center gap-1"
                   >
                     <Plus size={12} />
                     <span>Post Notice</span>
@@ -416,30 +416,30 @@ export function CourseHubDashboard({
                 {announcements.map((ann) => (
                   <div
                     key={ann.id}
-                    className="p-3 rounded-xl bg-neutral-50/80 border border-neutral-200/70 hover:border-neutral-300 transition-colors"
+                    className="p-3 rounded-xl bg-neutral-50/80 dark:bg-slate-800/80 border border-neutral-200/70 dark:border-slate-700 hover:border-neutral-300 dark:hover:border-slate-600 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2">
                         <span
                           className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             ann.authorRole === "admin"
-                              ? "bg-purple-100 text-purple-800"
-                              : "bg-amber-100 text-amber-800"
+                              ? "bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300"
+                              : "bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300"
                           }`}
                         >
                           {ann.authorRole === "admin" ? "HOD / Admin" : "Course Rep"}
                         </span>
-                        <h4 className="text-xs font-bold text-neutral-900">{ann.title}</h4>
+                        <h4 className="text-xs font-bold text-neutral-900 dark:text-slate-100">{ann.title}</h4>
                       </div>
-                      <span className="text-[10px] text-neutral-400 shrink-0">{ann.date}</span>
+                      <span className="text-[10px] text-neutral-400 dark:text-slate-400 shrink-0">{ann.date}</span>
                     </div>
-                    <p className="text-xs text-neutral-600 leading-relaxed pl-1">
+                    <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed pl-1">
                       {ann.content}
                     </p>
-                    <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-1.5 mt-1.5 border-t border-neutral-200/50">
+                    <div className="flex items-center justify-between text-[11px] text-neutral-400 dark:text-slate-400 pt-1.5 mt-1.5 border-t border-neutral-200/50 dark:border-slate-700">
                       <span>By: {ann.authorName}</span>
                       {ann.courseCode && (
-                        <span className="font-semibold text-neutral-500 font-mono">
+                        <span className="font-semibold text-neutral-500 dark:text-slate-400 font-mono">
                           Re: {ann.courseCode}
                         </span>
                       )}
@@ -451,48 +451,48 @@ export function CourseHubDashboard({
           )}
 
           {/* Course Hero Banner */}
-          <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-6 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-6 space-y-4 transition-colors">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs font-medium text-neutral-400">
+            <div className="flex items-center gap-2 text-xs font-medium text-neutral-400 dark:text-slate-400">
               <span>{activeCourse.semester || "HND 1 - First Semester"}</span>
               <span>&gt;</span>
-              <span className="font-bold text-[#006d64]">{activeCourse.code}</span>
+              <span className="font-bold text-[#006d64] dark:text-teal-400">{activeCourse.code}</span>
             </div>
 
             {/* Title & Description */}
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-2xl font-black text-neutral-900 font-sans tracking-tight">
+                <span className="text-2xl font-black text-neutral-900 dark:text-white font-sans tracking-tight">
                   {activeCourse.code}
                 </span>
-                <span className="text-sm font-semibold text-neutral-500">—</span>
-                <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">
+                <span className="text-sm font-semibold text-neutral-500 dark:text-slate-400">—</span>
+                <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">
                   {activeCourse.title}
                 </h1>
               </div>
-              <p className="text-xs text-neutral-600 leading-relaxed max-w-2xl">
+              <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                 {activeCourse.description || "Core syllabus modules, laboratory exercises, active recall flashcards and CBT testing."}
               </p>
             </div>
 
             {/* Badges row */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-700">
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-slate-800 text-neutral-700 dark:text-slate-200">
                 {activeCourse.units || 3} Units
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800">
                 {activeCourse.isCompulsory !== false ? "Compulsory" : "Elective"}
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/60">
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800">
                 {totalCards} Flashcard Decks
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800">
                 {activeCourse.practicalCount || 0} Practical Labs
               </span>
             </div>
 
             {/* Quick Action Buttons Row */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-neutral-100">
+            <div className="flex flex-wrap items-center gap-2.5 pt-3 border-t border-neutral-100 dark:border-slate-800">
               <button
                 onClick={() => onOpenCBTQuiz(activeCourse, "objective")}
                 className="px-4 py-2 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5"
@@ -503,23 +503,23 @@ export function CourseHubDashboard({
 
               <button
                 onClick={() => onStartStudy(activeCourse.code)}
-                className="px-4 py-2 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 hover:bg-neutral-50 dark:hover:bg-slate-800 text-neutral-800 dark:text-slate-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
               >
-                <Layers size={14} className="text-[#006d64]" />
+                <Layers size={14} className="text-[#006d64] dark:text-teal-400" />
                 <span>Study Flashcards</span>
               </button>
 
               <button
                 onClick={() => onOpenPracticalReports(activeCourse)}
-                className="px-4 py-2 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 hover:bg-neutral-50 dark:hover:bg-slate-800 text-neutral-800 dark:text-slate-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
               >
-                <Microscope size={14} className="text-indigo-600" />
+                <Microscope size={14} className="text-indigo-600 dark:text-indigo-400" />
                 <span>Practical Reports</span>
               </button>
 
               <button
                 onClick={onOpenHandwrittenConverter}
-                className="px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-900 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-900 dark:text-amber-300 text-xs font-bold shadow-2xs transition-all flex items-center gap-1.5"
               >
                 <span>✍️</span>
                 <span>Convert Handwritten Note</span>
@@ -530,40 +530,40 @@ export function CourseHubDashboard({
           {/* 2x2 Bento Grid from Screenshot */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Card 1: CBT Practice Centre */}
-            <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 transition-colors">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 dark:hover:border-teal-500/40 transition-colors">
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-50 text-[#7952eb] flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-[#7952eb] dark:text-purple-300 flex items-center justify-center font-bold">
                       <Award size={18} />
                     </div>
-                    <h3 className="font-bold text-sm text-neutral-900">CBT Practice Centre</h3>
+                    <h3 className="font-bold text-sm text-neutral-900 dark:text-white">CBT Practice Centre</h3>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f0ebff] text-[#7952eb]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#f0ebff] dark:bg-purple-950/80 text-[#7952eb] dark:text-purple-300">
                     Exam Simulation
                   </span>
                 </div>
-                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed mb-4">
                   Three test modes — Objective (MCQ), German-style (true/false with penalty), and full Theory. Timed. Scored. Reviewed.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-neutral-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-neutral-100 dark:border-slate-800">
                 <button
                   onClick={() => onOpenCBTQuiz(activeCourse, "objective")}
-                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 hover:bg-[#006d64] hover:text-white text-neutral-800 text-[11px] font-bold transition-colors text-center"
+                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 dark:bg-slate-800 hover:bg-[#006d64] hover:text-white dark:hover:bg-teal-600 dark:hover:text-white text-neutral-800 dark:text-slate-200 text-[11px] font-bold transition-colors text-center"
                 >
                   Objective
                 </button>
                 <button
                   onClick={() => onOpenCBTQuiz(activeCourse, "german")}
-                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 hover:bg-amber-600 hover:text-white text-neutral-800 text-[11px] font-bold transition-colors text-center"
+                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 dark:bg-slate-800 hover:bg-amber-600 hover:text-white dark:hover:bg-amber-600 dark:hover:text-white text-neutral-800 dark:text-slate-200 text-[11px] font-bold transition-colors text-center"
                 >
                   German
                 </button>
                 <button
                   onClick={() => onOpenCBTQuiz(activeCourse, "theory")}
-                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 hover:bg-indigo-600 hover:text-white text-neutral-800 text-[11px] font-bold transition-colors text-center"
+                  className="flex-1 py-1.5 rounded-lg bg-neutral-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white text-neutral-800 dark:text-slate-200 text-[11px] font-bold transition-colors text-center"
                 >
                   Theory
                 </button>
@@ -573,26 +573,26 @@ export function CourseHubDashboard({
             {/* Card 2: Flashcards */}
             <div
               onClick={() => onStartStudy(activeCourse.code)}
-              className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 transition-colors cursor-pointer group"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 dark:hover:border-teal-500/40 transition-colors cursor-pointer group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-teal-50 text-[#006d64] flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-950/60 text-[#006d64] dark:text-teal-300 flex items-center justify-center font-bold">
                       <Layers size={18} />
                     </div>
-                    <h3 className="font-bold text-sm text-neutral-900">Flashcards</h3>
+                    <h3 className="font-bold text-sm text-neutral-900 dark:text-white">Flashcards</h3>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-[#006d64]">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/80 text-[#006d64] dark:text-teal-300">
                     Active recall
                   </span>
                 </div>
-                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed mb-4">
                   Spaced-repetition cards covering key concepts, definitions, formulas and mechanisms.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-xs font-bold text-[#006d64] group-hover:underline">
+              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-slate-800 text-xs font-bold text-[#006d64] dark:text-teal-400 group-hover:underline">
                 <span>Study {totalCards} cards</span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </div>
@@ -601,26 +601,26 @@ export function CourseHubDashboard({
             {/* Card 3: Practical Reports */}
             <div
               onClick={() => onOpenPracticalReports(activeCourse)}
-              className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 transition-colors cursor-pointer group"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 dark:hover:border-teal-500/40 transition-colors cursor-pointer group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold">
                       <Microscope size={18} />
                     </div>
-                    <h3 className="font-bold text-sm text-neutral-900">Practical Reports</h3>
+                    <h3 className="font-bold text-sm text-neutral-900 dark:text-white">Practical Reports</h3>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300">
                     Lab work
                   </span>
                 </div>
-                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed mb-4">
                   Lab write-ups with aims, procedures, observations and conclusions.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-xs font-bold text-[#006d64] group-hover:underline">
+              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-slate-800 text-xs font-bold text-[#006d64] dark:text-teal-400 group-hover:underline">
                 <span>View reports</span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </div>
@@ -629,26 +629,26 @@ export function CourseHubDashboard({
             {/* Card 4: Course Outline */}
             <div
               onClick={() => setShowOutlineModal(true)}
-              className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 transition-colors cursor-pointer group"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xs p-5 flex flex-col justify-between hover:border-[#006d64]/40 dark:hover:border-teal-500/40 transition-colors cursor-pointer group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold">
                       <BookOpen size={18} />
                     </div>
-                    <h3 className="font-bold text-sm text-neutral-900">Course Outline</h3>
+                    <h3 className="font-bold text-sm text-neutral-900 dark:text-white">Course Outline</h3>
                   </div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">
                     Syllabus
                   </span>
                 </div>
-                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-600 dark:text-slate-300 leading-relaxed mb-4">
                   Full syllabus breakdown covering all topics, contact hours and learning objectives.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-xs font-bold text-[#006d64] group-hover:underline">
+              <div className="flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-slate-800 text-xs font-bold text-[#006d64] dark:text-teal-400 group-hover:underline">
                 <span>Read outline</span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
               </div>
@@ -660,14 +660,14 @@ export function CourseHubDashboard({
       {/* Course Outline Drawer / Modal */}
       {showOutlineModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-xs animate-fade-in"
           onClick={() => setShowOutlineModal(false)}
         >
           <div
-            className="w-full max-w-2xl bg-white rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden animate-scale-in"
+            className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-[#006d64] px-6 py-4 text-white flex items-center justify-between">
+            <div className="bg-[#006d64] dark:bg-teal-900/90 px-6 py-4 text-white flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-teal-200">
                   {activeCourse.code} • SYLLABUS
@@ -683,7 +683,7 @@ export function CourseHubDashboard({
             </div>
 
             <div className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
-              <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
                 Weekly Lecture & Laboratory Schedule
               </h4>
 
@@ -694,13 +694,13 @@ export function CourseHubDashboard({
                   "Memory Subsystems, Cache Mapping & AMAT Calculations",
                   "Pipelining, Hazards, Branch Prediction & Super-scalar Processing",
                 ]).map((topic, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-neutral-50 border border-neutral-200 flex items-start gap-3">
+                  <div key={i} className="p-3 rounded-xl bg-neutral-50 dark:bg-slate-800/80 border border-neutral-200 dark:border-slate-700 flex items-start gap-3">
                     <span className="w-6 h-6 rounded-lg bg-[#006d64] text-white flex items-center justify-center font-bold text-[11px] shrink-0">
                       {i + 1}
                     </span>
                     <div>
-                      <p className="font-bold text-neutral-900">{topic}</p>
-                      <p className="text-[11px] text-neutral-500 mt-0.5">
+                      <p className="font-bold text-neutral-900 dark:text-white">{topic}</p>
+                      <p className="text-[11px] text-neutral-500 dark:text-slate-400 mt-0.5">
                         Theoretical foundations, hardware representations, and weekly assessment questions.
                       </p>
                     </div>
@@ -709,10 +709,10 @@ export function CourseHubDashboard({
               </div>
             </div>
 
-            <div className="p-4 bg-neutral-50 border-t border-neutral-200 text-right">
+            <div className="p-4 bg-neutral-50 dark:bg-slate-900 border-t border-neutral-200 dark:border-slate-800 text-right">
               <button
                 onClick={() => setShowOutlineModal(false)}
-                className="px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-semibold"
+                className="px-4 py-2 rounded-xl bg-neutral-900 dark:bg-teal-600 dark:hover:bg-teal-500 text-white text-xs font-semibold"
               >
                 Close Syllabus
               </button>
@@ -724,11 +724,11 @@ export function CourseHubDashboard({
       {/* Role Announcement Creation Modal */}
       {showAnnouncementModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-xs animate-fade-in"
           onClick={() => setShowAnnouncementModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden animate-scale-in"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div
@@ -759,7 +759,7 @@ export function CourseHubDashboard({
 
             <form onSubmit={handlePostNotice} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                   Notice Headline / Title
                 </label>
                 <input
@@ -768,12 +768,12 @@ export function CourseHubDashboard({
                   placeholder="e.g. Schedule for Lab Practical / CBT Test Time"
                   value={newNoticeTitle}
                   onChange={(e) => setNewNoticeTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-neutral-400 dark:placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                   Announcement Details
                 </label>
                 <textarea
@@ -782,11 +782,11 @@ export function CourseHubDashboard({
                   placeholder="Provide explicit instructions, venue, or syllabus areas to prepare for..."
                   value={newNoticeContent}
                   onChange={(e) => setNewNoticeContent(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 bg-white dark:bg-slate-800 placeholder:text-neutral-400 dark:placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
                 />
               </div>
 
-              <div className="flex items-center justify-between text-xs text-neutral-600 pt-1">
+              <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-slate-400 pt-1">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -798,11 +798,11 @@ export function CourseHubDashboard({
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowAnnouncementModal(false)}
-                  className="px-4 py-2 rounded-xl text-neutral-600 hover:bg-neutral-100 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800 text-xs font-medium"
                 >
                   Cancel
                 </button>
@@ -825,26 +825,26 @@ export function CourseHubDashboard({
       {/* Academic Cohort & Institutional Switcher Modal */}
       {showCohortModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/40 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-xs"
           onClick={() => setShowCohortModal(false)}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200/90 shadow-xl overflow-hidden animate-scale-in"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100">
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-slate-800">
               <div>
-                <h3 className="font-serif-display text-lg font-bold text-neutral-900 flex items-center gap-2">
+                <h3 className="font-serif-display text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                   <span>🏛️</span>
                   <span>Switch Academic Cohort</span>
                 </h3>
-                <p className="text-xs text-neutral-500 mt-0.5">
+                <p className="text-xs text-neutral-500 dark:text-slate-400 mt-0.5">
                   Segregate your courses, notes, and exams by institution type, department, and academic level.
                 </p>
               </div>
               <button
                 onClick={() => setShowCohortModal(false)}
-                className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+                className="p-1.5 rounded-lg text-neutral-400 dark:text-slate-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-slate-800 transition-colors"
               >
                 <X size={18} />
               </button>
@@ -853,7 +853,7 @@ export function CourseHubDashboard({
             <div className="p-6 space-y-4">
               {/* Institution Type Selector (Polytechnic vs University) */}
               <div>
-                <label className="block text-xs font-bold text-neutral-700 mb-2">
+                <label className="block text-xs font-bold text-neutral-700 dark:text-slate-300 mb-2">
                   1. Institution Structure
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -869,14 +869,14 @@ export function CourseHubDashboard({
                     }}
                     className={`p-3 rounded-xl border text-left transition-all ${
                       modalInstType === "polytechnic"
-                        ? "bg-[#006d64]/10 border-[#006d64] text-[#006d64] shadow-xs"
-                        : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100"
+                        ? "bg-[#006d64]/10 dark:bg-teal-950/50 border-[#006d64] dark:border-teal-500 text-[#006d64] dark:text-teal-300 shadow-xs"
+                        : "bg-neutral-50 dark:bg-slate-800/80 border-neutral-200 dark:border-slate-700 text-neutral-600 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-750"
                     }`}
                   >
                     <p className="text-xs font-black flex items-center gap-1.5">
                       <span>⚙️</span> Polytechnic
                     </p>
-                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                    <p className="text-[11px] text-neutral-500 dark:text-slate-400 mt-0.5">
                       ND 1, ND 2, HND 1, HND 2
                     </p>
                   </button>
@@ -893,14 +893,14 @@ export function CourseHubDashboard({
                     }}
                     className={`p-3 rounded-xl border text-left transition-all ${
                       modalInstType === "university"
-                        ? "bg-[#006d64]/10 border-[#006d64] text-[#006d64] shadow-xs"
-                        : "bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100"
+                        ? "bg-[#006d64]/10 dark:bg-teal-950/50 border-[#006d64] dark:border-teal-500 text-[#006d64] dark:text-teal-300 shadow-xs"
+                        : "bg-neutral-50 dark:bg-slate-800/80 border-neutral-200 dark:border-slate-700 text-neutral-600 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-750"
                     }`}
                   >
                     <p className="text-xs font-black flex items-center gap-1.5">
                       <span>🎓</span> University
                     </p>
-                    <p className="text-[11px] text-neutral-500 mt-0.5">
+                    <p className="text-[11px] text-neutral-500 dark:text-slate-400 mt-0.5">
                       100L, 200L, 300L, 400L, 500L
                     </p>
                   </button>
@@ -909,7 +909,7 @@ export function CourseHubDashboard({
 
               {/* Institution Selection */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                   2. Select Institution
                 </label>
                 <select
@@ -924,10 +924,10 @@ export function CourseHubDashboard({
                       setModalLevel(inst.supportedLevels[0] || "100 Level");
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
                 >
                   {INSTITUTIONS.filter((i) => i.type === modalInstType).map((inst) => (
-                    <option key={inst.id} value={inst.id}>
+                    <option key={inst.id} value={inst.id} className="bg-white dark:bg-slate-800 text-neutral-900 dark:text-slate-100">
                       {inst.name} ({inst.id})
                     </option>
                   ))}
@@ -936,7 +936,7 @@ export function CourseHubDashboard({
 
               {/* Division (School / Faculty) */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                   3. {selectedInstObj.divisionLabel}
                 </label>
                 <select
@@ -949,10 +949,10 @@ export function CourseHubDashboard({
                       setModalDepartment(divObj.departments[0]);
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
                 >
                   {selectedInstObj.divisions.map((div) => (
-                    <option key={div.name} value={div.name}>
+                    <option key={div.name} value={div.name} className="bg-white dark:bg-slate-800 text-neutral-900 dark:text-slate-100">
                       {div.name}
                     </option>
                   ))}
@@ -961,16 +961,16 @@ export function CourseHubDashboard({
 
               {/* Department */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                   4. Department
                 </label>
                 <select
                   value={modalDepartment}
                   onChange={(e) => setModalDepartment(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 bg-white dark:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]"
                 >
                   {(activeDivisionObj?.departments || []).map((dept) => (
-                    <option key={dept} value={dept}>
+                    <option key={dept} value={dept} className="bg-white dark:bg-slate-800 text-neutral-900 dark:text-slate-100">
                       {dept}
                     </option>
                   ))}
@@ -979,7 +979,7 @@ export function CourseHubDashboard({
 
               {/* Academic Level (ND/HND for polytechnic, 100L-500L for university) */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                   5. Academic Level ({modalInstType === "polytechnic" ? "Polytechnic Track" : "University Track"})
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -993,7 +993,7 @@ export function CourseHubDashboard({
                         className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all ${
                           isSelected
                             ? "bg-[#006d64] text-white border-[#006d64] shadow-xs"
-                            : "bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100"
+                            : "bg-neutral-50 dark:bg-slate-800 text-neutral-700 dark:text-slate-300 border-neutral-200 dark:border-slate-700 hover:bg-neutral-100 dark:hover:bg-slate-750"
                         }`}
                       >
                         {lvl}
@@ -1003,11 +1003,11 @@ export function CourseHubDashboard({
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-neutral-100">
+              <div className="flex items-center justify-end gap-2 pt-4 border-t border-neutral-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setShowCohortModal(false)}
-                  className="px-4 py-2 rounded-xl text-neutral-600 hover:bg-neutral-100 text-xs font-medium"
+                  className="px-4 py-2 rounded-xl text-neutral-600 dark:text-slate-400 hover:bg-neutral-100 dark:hover:bg-slate-800 text-xs font-medium"
                 >
                   Cancel
                 </button>

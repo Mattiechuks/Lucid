@@ -54,16 +54,16 @@ export function PastQuestionsView({
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 mb-8 border-b border-neutral-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 mb-8 border-b border-neutral-200/80 dark:border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-600 mb-2">
-            <GraduationCap size={13} className="text-blue-600" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-slate-800 text-neutral-600 dark:text-slate-300 mb-2">
+            <GraduationCap size={13} className="text-blue-600 dark:text-blue-400" />
             Archive & Repository
           </div>
-          <h1 className="font-serif-display text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
+          <h1 className="font-serif-display text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
             Past Examination Papers
           </h1>
-          <p className="text-sm text-neutral-500 mt-1 max-w-xl">
+          <p className="text-sm text-neutral-500 dark:text-slate-400 mt-1 max-w-xl">
             Official continuous assessment and final exam papers organized by course, semester, and academic session.
           </p>
         </div>
@@ -71,10 +71,10 @@ export function PastQuestionsView({
         {currentUser?.role === "student" ? (
           <button
             onClick={onUploadClick}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-semibold shadow-xs transition-all active:scale-[0.98] self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-300/80 dark:border-amber-700 text-amber-900 dark:text-amber-300 text-xs font-semibold shadow-xs transition-all active:scale-[0.98] self-start sm:self-auto"
             title="Past paper archives are managed by Course Representatives"
           >
-            <Lock size={14} className="text-amber-700" />
+            <Lock size={14} className="text-amber-700 dark:text-amber-400" />
             <span>Upload Paper (Rep Only)</span>
           </button>
         ) : (
@@ -90,17 +90,17 @@ export function PastQuestionsView({
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-2xl border border-neutral-200/80 shadow-2xs mb-6 space-y-3">
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-neutral-200/80 dark:border-slate-800 shadow-2xs mb-6 space-y-3">
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           {/* Search */}
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Search paper by course code, session, or file name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-50/70 border border-neutral-200 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:bg-white transition-all"
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-50/70 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:bg-white dark:focus:bg-slate-800 transition-all"
             />
           </div>
 
@@ -109,7 +109,7 @@ export function PastQuestionsView({
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-medium text-neutral-700 focus:outline-none focus:bg-white"
+              className="px-3 py-2 rounded-xl bg-neutral-50 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs font-medium text-neutral-700 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-slate-800"
             >
               <option value="ALL">All Courses</option>
               {courses.map((c) => (
@@ -123,7 +123,7 @@ export function PastQuestionsView({
             <select
               value={selectedSession}
               onChange={(e) => setSelectedSession(e.target.value)}
-              className="px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-medium text-neutral-700 focus:outline-none focus:bg-white"
+              className="px-3 py-2 rounded-xl bg-neutral-50 dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs font-medium text-neutral-700 dark:text-slate-200 focus:outline-none focus:bg-white dark:focus:bg-slate-800"
             >
               <option value="ALL">All Sessions</option>
               {SESSIONS.map((s) => (
@@ -136,16 +136,16 @@ export function PastQuestionsView({
         </div>
 
         {/* Exam Type Segmented Filters */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-neutral-100 overflow-x-auto text-xs">
-          <span className="text-neutral-400 font-medium mr-1 text-[11px]">Type:</span>
+        <div className="flex items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-slate-800 overflow-x-auto text-xs">
+          <span className="text-neutral-400 dark:text-slate-500 font-medium mr-1 text-[11px]">Type:</span>
           {["ALL", ...EXAM_TYPES].map((type) => (
             <button
               key={type}
               onClick={() => setSelectedExamType(type)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                 selectedExamType === type
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100"
+                  ? "bg-neutral-900 dark:bg-teal-700 text-white"
+                  : "bg-neutral-50 dark:bg-slate-800 text-neutral-600 dark:text-slate-300 hover:bg-neutral-100 dark:hover:bg-slate-750"
               }`}
             >
               {type === "ALL" ? "All Papers" : type}
@@ -156,14 +156,14 @@ export function PastQuestionsView({
 
       {/* Grid of Papers */}
       {filteredPapers.length === 0 ? (
-        <div className="bg-white border border-dashed border-neutral-300 rounded-2xl p-12 text-center max-w-lg mx-auto my-8">
-          <div className="w-12 h-12 rounded-xl bg-neutral-100 text-neutral-500 mx-auto flex items-center justify-center mb-3">
+        <div className="bg-white dark:bg-slate-900 border border-dashed border-neutral-300 dark:border-slate-800 rounded-2xl p-12 text-center max-w-lg mx-auto my-8">
+          <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-slate-800 text-neutral-500 dark:text-slate-400 mx-auto flex items-center justify-center mb-3">
             <GraduationCap size={22} />
           </div>
-          <h3 className="font-serif-display text-lg font-semibold text-neutral-900 mb-1">
+          <h3 className="font-serif-display text-lg font-semibold text-neutral-900 dark:text-white mb-1">
             No past papers found
           </h3>
-          <p className="text-xs text-neutral-500 mb-5">
+          <p className="text-xs text-neutral-500 dark:text-slate-400 mb-5">
             Try adjusting your course, session, or exam type filters.
           </p>
           <button
@@ -173,7 +173,7 @@ export function PastQuestionsView({
               setSelectedSession("ALL");
               setSelectedExamType("ALL");
             }}
-            className="px-3.5 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-neutral-100 dark:bg-slate-800 hover:bg-neutral-200 dark:hover:bg-slate-700 text-neutral-800 dark:text-slate-200 text-xs font-semibold transition-colors"
           >
             Reset Filters
           </button>
@@ -183,35 +183,35 @@ export function PastQuestionsView({
           {filteredPapers.map((paper) => (
             <div
               key={paper.id}
-              className="bg-white border border-neutral-200/80 rounded-2xl p-5 hover:border-neutral-300 transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between"
+              className="bg-white dark:bg-slate-900 border border-neutral-200/80 dark:border-slate-800 rounded-2xl p-5 hover:border-neutral-300 dark:hover:border-slate-700 transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[11px] font-bold text-neutral-800 bg-neutral-100 px-2.5 py-0.5 rounded border border-neutral-200">
+                  <span className="text-[11px] font-bold text-neutral-800 dark:text-slate-200 bg-neutral-100 dark:bg-slate-800 px-2.5 py-0.5 rounded border border-neutral-200 dark:border-slate-700">
                     {paper.course}
                   </span>
-                  <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+                  <span className="text-[11px] font-semibold text-blue-700 dark:text-teal-300 bg-blue-50 dark:bg-teal-950/50 px-2 py-0.5 rounded border border-blue-200/60 dark:border-teal-800">
                     {paper.examType}
                   </span>
                 </div>
 
-                <h3 className="font-serif-display text-base font-bold text-neutral-900 mb-1">
+                <h3 className="font-serif-display text-base font-bold text-neutral-900 dark:text-white mb-1">
                   Session {paper.session}
                 </h3>
-                <p className="text-xs text-neutral-500 font-mono truncate mb-3">
+                <p className="text-xs text-neutral-500 dark:text-slate-400 font-mono truncate mb-3">
                   {paper.fileName}
                 </p>
 
-                <div className="text-[11px] text-neutral-400 space-y-0.5 mb-4">
+                <div className="text-[11px] text-neutral-400 dark:text-slate-500 space-y-0.5 mb-4">
                   <div>Uploaded on {paper.uploadedAt}</div>
                   <div>File size: {paper.fileSize || "1.8 MB"}</div>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-neutral-100 flex items-center gap-2">
+              <div className="pt-3 border-t border-neutral-100 dark:border-slate-800 flex items-center gap-2">
                 <button
                   onClick={() => onPreviewPaper(paper)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-50 hover:bg-neutral-100 text-neutral-800 text-xs font-semibold border border-neutral-200 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-slate-800 hover:bg-neutral-100 dark:hover:bg-slate-750 text-neutral-800 dark:text-slate-200 text-xs font-semibold border border-neutral-200 dark:border-slate-700 transition-colors"
                 >
                   <Eye size={13} />
                   <span>Preview</span>
@@ -219,7 +219,7 @@ export function PastQuestionsView({
 
                 <button
                   onClick={() => onDownloadPaper(paper)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold transition-colors shadow-2xs"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 dark:bg-teal-700 hover:bg-neutral-800 dark:hover:bg-teal-600 text-white text-xs font-semibold transition-colors shadow-2xs"
                 >
                   <Download size={13} />
                   <span>Download</span>

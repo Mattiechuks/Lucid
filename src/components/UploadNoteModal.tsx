@@ -88,26 +88,26 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/40 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-xs"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-white rounded-2xl border border-neutral-200/90 shadow-xl overflow-hidden animate-scale-in"
+        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-xl overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-neutral-100 dark:border-slate-800">
           <div>
-            <h2 className="font-serif-display text-lg font-bold text-neutral-900">
+            <h2 className="font-serif-display text-lg font-bold text-neutral-900 dark:text-white">
               Upload Course Note
             </h2>
-            <p className="text-xs text-neutral-500 mt-0.5">
+            <p className="text-xs text-neutral-500 dark:text-slate-400 mt-0.5">
               Lucid turns your material into high-yield flashcards.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+            className="p-1.5 rounded-lg text-neutral-400 dark:text-slate-500 hover:text-neutral-700 dark:hover:text-slate-200 hover:bg-neutral-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X size={18} />
           </button>
@@ -117,33 +117,33 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
         <div className="px-6 pt-4 space-y-3">
           {/* Official Course Rep Authorization Pill */}
           {currentUser && (
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/90 flex items-center justify-between text-xs">
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/80 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-lg bg-amber-200 text-amber-900 flex items-center justify-center font-bold text-sm">
+                <span className="w-7 h-7 rounded-lg bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 flex items-center justify-center font-bold text-sm">
                   📢
                 </span>
                 <div>
-                  <p className="font-bold text-amber-950 text-xs">
+                  <p className="font-bold text-amber-950 dark:text-amber-200 text-xs">
                     Course Rep Upload Authorization Active
                   </p>
-                  <p className="text-[11px] text-amber-800 mt-0.5">
+                  <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5">
                     Uploader: <strong>{currentUser.name}</strong> • {currentUser.institutionId} ({currentUser.level})
                   </p>
                 </div>
               </div>
-              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-200/90 text-amber-950 shrink-0">
+              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-200/90 dark:bg-amber-800 text-amber-950 dark:text-amber-100 shrink-0">
                 Verified
               </span>
             </div>
           )}
 
           {/* Handwritten Note Highlight Banner */}
-          <div className="p-3 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-between gap-3">
+          <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200/80 dark:border-teal-800/80 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <span className="text-base">✍️</span>
               <div>
-                <p className="text-xs font-bold text-[#006d64]">Have handwritten notebook notes?</p>
-                <p className="text-[11px] text-teal-800">Use our AI Handwriting OCR to transcribe photo scans into flashcards.</p>
+                <p className="text-xs font-bold text-[#006d64] dark:text-teal-300">Have handwritten notebook notes?</p>
+                <p className="text-[11px] text-teal-800 dark:text-teal-300/80">Use our AI Handwriting OCR to transcribe photo scans into flashcards.</p>
               </div>
             </div>
             <button
@@ -158,14 +158,14 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
             </button>
           </div>
 
-          <div className="flex rounded-xl bg-neutral-100 p-1 text-xs font-semibold">
+          <div className="flex rounded-xl bg-neutral-100 dark:bg-slate-800 p-1 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setActiveTab("file")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
                 activeTab === "file"
-                  ? "bg-white text-neutral-900 shadow-2xs"
-                  : "text-neutral-500 hover:text-neutral-800"
+                  ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs"
+                  : "text-neutral-500 dark:text-slate-400 hover:text-neutral-800 dark:hover:text-slate-200"
               }`}
             >
               <Upload size={13} />
@@ -176,8 +176,8 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
               onClick={() => setActiveTab("paste")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
                 activeTab === "paste"
-                  ? "bg-white text-neutral-900 shadow-2xs"
-                  : "text-neutral-500 hover:text-neutral-800"
+                  ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs"
+                  : "text-neutral-500 dark:text-slate-400 hover:text-neutral-800 dark:hover:text-slate-200"
               }`}
             >
               <AlignLeft size={13} />
@@ -190,13 +190,13 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Course select */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+            <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
               Course
             </label>
             <select
               value={course}
               onChange={(e) => setCourse(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-medium text-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs font-medium text-neutral-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
             >
               {courses.map((c) => (
                 <option key={c.code} value={c.code}>
@@ -208,7 +208,7 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
 
           {/* Note Title */}
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+            <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
               Note Title
             </label>
             <input
@@ -216,14 +216,14 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
               placeholder="e.g. Week 8 — Database Concurrency & 2PL"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+              className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
             />
           </div>
 
           {/* File picker or Paste textarea */}
           {activeTab === "file" ? (
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                 Select Document
               </label>
               <div
@@ -240,39 +240,39 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
                 onClick={() => fileInputRef.current?.click()}
                 className={`w-full border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
                   isDragging
-                    ? "border-blue-500 bg-blue-50/50"
+                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/40"
                     : fileName
-                    ? "border-emerald-300 bg-emerald-50/30"
-                    : "border-neutral-200 hover:border-neutral-300 bg-neutral-50/50"
+                    ? "border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/30"
+                    : "border-neutral-200 dark:border-slate-700 hover:border-neutral-300 dark:hover:border-slate-600 bg-neutral-50/50 dark:bg-slate-800/50"
                 }`}
               >
                 {isExtractingPdf ? (
-                  <div className="space-y-2 py-2 text-emerald-700">
-                    <Loader2 size={24} className="mx-auto animate-spin text-[#006d64]" />
+                  <div className="space-y-2 py-2 text-emerald-700 dark:text-emerald-300">
+                    <Loader2 size={24} className="mx-auto animate-spin text-[#006d64] dark:text-teal-400" />
                     <p className="text-xs font-semibold">Extracting Lecture Content via PDF.js engine...</p>
-                    <p className="text-[11px] text-neutral-500">Transcribing pages into clean machine-readable text</p>
+                    <p className="text-[11px] text-neutral-500 dark:text-slate-400">Transcribing pages into clean machine-readable text</p>
                   </div>
                 ) : fileName ? (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-2 text-emerald-700 text-xs font-medium">
+                    <div className="flex items-center justify-center gap-2 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
                       <Check size={16} />
                       <span className="font-semibold">{fileName}</span>
                     </div>
                     {pdfStats && (
-                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-300/80 text-[11px] font-semibold text-emerald-900">
+                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100/80 dark:bg-emerald-950/60 border border-emerald-300/80 dark:border-emerald-800 text-[11px] font-semibold text-emerald-900 dark:text-emerald-200">
                         <BookOpen size={12} />
                         <span>{pdfStats.pages} Page{pdfStats.pages > 1 ? "s" : ""} Extracted • ~{pdfStats.words.toLocaleString()} Words Ready</span>
                       </div>
                     )}
-                    <p className="text-[10px] text-neutral-400">Click to change document</p>
+                    <p className="text-[10px] text-neutral-400 dark:text-slate-500">Click to change document</p>
                   </div>
                 ) : (
-                  <div className="space-y-1.5 text-neutral-500">
-                    <Upload size={20} className="mx-auto text-neutral-400" />
+                  <div className="space-y-1.5 text-neutral-500 dark:text-slate-400">
+                    <Upload size={20} className="mx-auto text-neutral-400 dark:text-slate-500" />
                     <p className="text-xs font-medium">
                       Click to choose or drag and drop file here
                     </p>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-neutral-400 dark:text-slate-500">
                       PDF (automatic text extraction), DOCX, or plain text
                     </p>
                   </div>
@@ -288,7 +288,7 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
             </div>
           ) : (
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1.5">
                 Lecture Excerpt or Summary
               </label>
               <textarea
@@ -296,7 +296,7 @@ export function UploadNoteModal({ courses, onClose, onOpenHandwritten, onSubmit,
                 placeholder="Paste key points, lecture slides summary, or syllabus definitions here..."
                 value={rawText}
                 onChange={(e) => setRawText(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-neutral-200 dark:border-slate-700 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
               />
             </div>
           )}

@@ -42,45 +42,59 @@ html.dark {
 }
 
 html.dark body {
-  background-color: #0a0f1d !important;
+  background-color: #070d18 !important;
   color: #f1f5f9 !important;
 }
 
-/* Core card & container surfaces */
+/* Core card & container surfaces - cool deep dark palette */
 .dark .bg-white {
-  background-color: #121a2c !important;
+  background-color: #0f172a !important;
 }
 
 .dark .bg-white\/95,
 .dark .bg-white\/90,
-.dark .bg-white\/80 {
-  background-color: rgba(18, 26, 44, 0.95) !important;
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/60,
+.dark .bg-white\/50 {
+  background-color: rgba(15, 23, 42, 0.95) !important;
 }
 
 .dark .bg-\[\#faf9f6\],
 .dark .bg-\[\#f8fafc\] {
-  background-color: #0a0f1d !important;
+  background-color: #070d18 !important;
 }
 
+/* Neutral & Slate light container classes in dark mode */
 .dark .bg-neutral-50,
 .dark .bg-slate-50,
 .dark .bg-gray-50,
-.dark .bg-neutral-50\/50 {
-  background-color: #0e1627 !important;
+.dark [class*="bg-neutral-50"],
+.dark [class*="bg-slate-50"],
+.dark [class*="bg-gray-50"],
+.dark [class*="bg-slate-850"] {
+  background-color: #0c1322 !important;
 }
 
 .dark .bg-neutral-100,
 .dark .bg-slate-100,
-.dark .bg-gray-100 {
-  background-color: #18233a !important;
+.dark .bg-gray-100,
+.dark [class*="bg-neutral-100"],
+.dark [class*="bg-slate-100"],
+.dark [class*="bg-gray-100"] {
+  background-color: #111a2e !important;
 }
 
 .dark .bg-neutral-200,
-.dark .bg-slate-200 {
-  background-color: #243452 !important;
+.dark .bg-slate-200,
+.dark .bg-gray-200,
+.dark [class*="bg-neutral-200"],
+.dark [class*="bg-slate-200"],
+.dark [class*="bg-gray-200"] {
+  background-color: #17233c !important;
 }
 
-/* Borders & Dividers */
+/* Borders & Dividers - cool dark slate lines */
 .dark .border-neutral-200,
 .dark .border-neutral-200\/60,
 .dark .border-neutral-200\/70,
@@ -88,18 +102,22 @@ html.dark body {
 .dark .border-neutral-200\/90,
 .dark .border-neutral-300,
 .dark .border-slate-200,
-.dark .border-gray-200 {
-  border-color: #202d45 !important;
+.dark .border-gray-200,
+.dark [class*="border-neutral-200"],
+.dark [class*="border-slate-200"] {
+  border-color: #1b263b !important;
 }
 
 .dark .border-neutral-100,
-.dark .border-slate-100 {
-  border-color: #19243a !important;
+.dark .border-slate-100,
+.dark [class*="border-neutral-100"],
+.dark [class*="border-slate-100"] {
+  border-color: #152033 !important;
 }
 
 .dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]),
 .dark .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) {
-  border-color: #202d45 !important;
+  border-color: #1b263b !important;
 }
 
 /* Typography Hierarchy */

@@ -155,15 +155,15 @@ export function AuthModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-xs animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-white rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden animate-scale-in"
+        className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/90 dark:border-slate-800 shadow-2xl overflow-hidden animate-scale-in transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header with Brand */}
-        <div className="bg-[#006d64] px-6 py-5 text-white flex items-center justify-between">
+        <div className="bg-[#006d64] dark:bg-teal-900/90 px-6 py-5 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-sm">
               L
@@ -192,14 +192,14 @@ export function AuthModal({
 
         {/* Tab Switcher: Sign In vs Sign Up */}
         <div className="px-6 pt-4 space-y-3">
-          <div className="flex rounded-xl bg-neutral-100 p-1 text-xs font-semibold">
+          <div className="flex rounded-xl bg-neutral-100 dark:bg-slate-800 p-1 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setMode("signin")}
               className={`flex-1 py-1.5 rounded-lg transition-all ${
                 mode === "signin"
-                  ? "bg-white text-neutral-900 shadow-2xs font-bold"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs font-bold"
+                  : "text-neutral-500 dark:text-slate-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Sign In
@@ -209,8 +209,8 @@ export function AuthModal({
               onClick={() => setMode("signup")}
               className={`flex-1 py-1.5 rounded-lg transition-all ${
                 mode === "signup"
-                  ? "bg-white text-neutral-900 shadow-2xs font-bold"
-                  : "text-neutral-500 hover:text-neutral-900"
+                  ? "bg-white dark:bg-slate-700 text-neutral-900 dark:text-white shadow-2xs font-bold"
+                  : "text-neutral-500 dark:text-slate-400 hover:text-neutral-900 dark:hover:text-white"
               }`}
             >
               Create Account
@@ -224,8 +224,8 @@ export function AuthModal({
               onClick={() => handleRoleChange("student")}
               className={`p-2 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1 ${
                 selectedRole === "student"
-                  ? "border-[#006d64] bg-teal-50 text-[#006d64] ring-1 ring-[#006d64]"
-                  : "border-neutral-200 text-neutral-600 bg-neutral-50/50"
+                  ? "border-[#006d64] dark:border-teal-400 bg-teal-50 dark:bg-teal-950/60 text-[#006d64] dark:text-teal-300 ring-1 ring-[#006d64] dark:ring-teal-400"
+                  : "border-neutral-200 dark:border-slate-700 text-neutral-600 dark:text-slate-300 bg-neutral-50/50 dark:bg-slate-800/50"
               }`}
             >
               <GraduationCap size={14} />
@@ -236,8 +236,8 @@ export function AuthModal({
               onClick={() => handleRoleChange("courserep")}
               className={`p-2 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1 ${
                 selectedRole === "courserep"
-                  ? "border-amber-600 bg-amber-50 text-amber-900 ring-1 ring-amber-600"
-                  : "border-neutral-200 text-neutral-600 bg-neutral-50/50"
+                  ? "border-amber-600 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 ring-1 ring-amber-600 dark:ring-amber-500"
+                  : "border-neutral-200 dark:border-slate-700 text-neutral-600 dark:text-slate-300 bg-neutral-50/50 dark:bg-slate-800/50"
               }`}
             >
               <Megaphone size={14} />
@@ -248,8 +248,8 @@ export function AuthModal({
               onClick={() => handleRoleChange("admin")}
               className={`p-2 rounded-xl border text-center text-xs font-bold transition-all flex flex-col items-center gap-1 ${
                 selectedRole === "admin"
-                  ? "border-purple-600 bg-purple-50 text-purple-900 ring-1 ring-purple-600"
-                  : "border-neutral-200 text-neutral-600 bg-neutral-50/50"
+                  ? "border-purple-600 dark:border-purple-500 bg-purple-50 dark:bg-purple-950/60 text-purple-900 dark:text-purple-300 ring-1 ring-purple-600 dark:ring-purple-500"
+                  : "border-neutral-200 dark:border-slate-700 text-neutral-600 dark:text-slate-300 bg-neutral-50/50 dark:bg-slate-800/50"
               }`}
             >
               <Shield size={14} />
@@ -262,7 +262,7 @@ export function AuthModal({
         {mode === "signin" ? (
           <form onSubmit={handleSignIn} className="p-6 pt-3 space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                 {selectedRole === "admin"
                   ? "Staff ID or Admin Email"
                   : selectedRole === "courserep"
@@ -270,7 +270,7 @@ export function AuthModal({
                   : "Matriculation Number or Email"}
               </label>
               <div className="relative">
-                <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-slate-500" />
                 <input
                   type="text"
                   required
@@ -283,23 +283,23 @@ export function AuthModal({
                   }
                   value={signInIdentifier}
                   onChange={(e) => setSignInIdentifier(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-slate-500" />
                 <input
                   type="password"
                   required
                   value={signInPassword}
                   onChange={(e) => setSignInPassword(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
                 />
               </div>
             </div>
@@ -326,27 +326,27 @@ export function AuthModal({
             </button>
 
             {/* Instant Demo Switcher */}
-            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
-              <span className="text-[11px] text-neutral-400">⚡ 1-Click Fast Login:</span>
+            <div className="pt-2 border-t border-neutral-100 dark:border-slate-800 flex items-center justify-between">
+              <span className="text-[11px] text-neutral-400 dark:text-slate-500">⚡ 1-Click Fast Login:</span>
               <div className="flex gap-1.5">
                 <button
                   type="button"
                   onClick={() => fillDemoAccount("student")}
-                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 text-[#006d64]"
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/60 text-[#006d64] dark:text-teal-300"
                 >
                   Student
                 </button>
                 <button
                   type="button"
                   onClick={() => fillDemoAccount("courserep")}
-                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800"
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
                 >
                   Rep
                 </button>
                 <button
                   type="button"
                   onClick={() => fillDemoAccount("admin")}
-                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-800"
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300"
                 >
                   Admin
                 </button>
@@ -355,12 +355,12 @@ export function AuthModal({
           </form>
         ) : selectedRole !== "student" ? (
           <div className="p-6 pt-4 space-y-3">
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-neutral-800 space-y-2">
-              <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
-                <Lock size={14} className="text-amber-700" />
+            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-neutral-800 dark:text-slate-200 space-y-2">
+              <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-xs">
+                <Lock size={14} className="text-amber-700 dark:text-amber-400" />
                 <span>Admin Provisioning Required</span>
               </div>
-              <p className="text-[11px] text-neutral-700 leading-relaxed">
+              <p className="text-[11px] text-neutral-700 dark:text-slate-300 leading-relaxed">
                 <strong>{selectedRole === "admin" ? "Administrator" : "Course Representative"}</strong> accounts
                 cannot be created publicly. By departmental rules, they must be officially assigned and
                 provisioned by the <strong>Department Administrator (HOD / Exam Officer)</strong>.
@@ -382,7 +382,7 @@ export function AuthModal({
             <button
               type="button"
               onClick={() => setSelectedRole("student")}
-              className="w-full py-2 text-center text-xs font-semibold text-[#006d64] hover:underline"
+              className="w-full py-2 text-center text-xs font-semibold text-[#006d64] dark:text-teal-400 hover:underline"
             >
               ← Or register as a Student Scholar
             </button>
@@ -390,12 +390,12 @@ export function AuthModal({
         ) : (
           <form onSubmit={handleSignUp} className="p-6 pt-3 space-y-3">
             {authError && (
-              <div className="p-2 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
+              <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300 font-medium">
                 {authError}
               </div>
             )}
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                 Full Name
               </label>
               <input
@@ -404,12 +404,12 @@ export function AuthModal({
                 placeholder="e.g. Kelechi Okafor"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                 Matriculation Number
               </label>
               <input
@@ -418,12 +418,12 @@ export function AuthModal({
                 placeholder="SWD/2024/001"
                 value={matricNo}
                 onChange={(e) => setMatricNo(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64] uppercase"
+                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64] uppercase"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+              <label className="block text-xs font-semibold text-neutral-700 dark:text-slate-300 mb-1">
                 Email
               </label>
               <input
@@ -432,7 +432,7 @@ export function AuthModal({
                 placeholder="email@lucid.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
+                className="w-full px-3.5 py-2 rounded-xl border border-neutral-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-neutral-900 dark:text-slate-100 placeholder-neutral-400 dark:placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-[#006d64]/20 focus:border-[#006d64]"
               />
             </div>
 
